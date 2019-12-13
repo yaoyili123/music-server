@@ -17,6 +17,8 @@ public interface AlbumMapper {
 
     List<Album> selectByName(String name);
 
+    List<Album> selectCollections(int uid);
+
     List<Album> selectAll(@Param("offset") int offset,
                           @Param("size") int pageSize,
                           @Param("name")String filterName,

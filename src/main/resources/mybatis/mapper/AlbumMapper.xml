@@ -24,6 +24,13 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
 
+  <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from album natural join album_collect
+    where album.id = album_collect.aid and album_collect.uid = #{uid,jdbcType=INTEGER}
+  </select>
+
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

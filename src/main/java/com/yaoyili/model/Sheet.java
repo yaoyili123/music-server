@@ -15,6 +15,8 @@ public class Sheet {
 
     private String description;
 
+    private Boolean s = true;
+
     public Sheet() {}
 
     public Sheet(Integer id, String name, Integer uid, Integer songNum, String picUrl, String description) {
@@ -72,5 +74,13 @@ public class Sheet {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getS() {
+        return s;
+    }
+
+    public void setS(Boolean show) {
+        this.s = show;
     }
 }

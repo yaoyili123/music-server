@@ -9,7 +9,7 @@
     <result column="mUrl" jdbcType="VARCHAR" property="mUrl" />
   </resultMap>
 
-  <resultMap id="ResponseMap" type="com.yaoyili.controller.SongResponse">
+  <resultMap id="ResponseMap" type="com.yaoyili.controller.resbeans.SongResponse">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="albumId" jdbcType="INTEGER" property="albumId" />
     <result column="name" jdbcType="VARCHAR" property="name" />

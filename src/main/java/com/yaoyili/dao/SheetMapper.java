@@ -7,13 +7,18 @@ import java.util.List;
 
 @Mapper
 public interface SheetMapper {
+
     int deleteByPrimaryKey(Integer id);
 
     int insertSelective(Sheet record);
 
     Sheet selectByPrimaryKey(Integer id);
 
+    List<Sheet> selectCollections(int uid);
+
     List<Sheet> selectByUid(Integer uid);
+
+    List<Sheet> selectPublic(Integer uid);
 
     List<Sheet> selectByName(String name);
 

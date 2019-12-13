@@ -1,5 +1,7 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.ResultBean;
+import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.model.Song;
 import com.yaoyili.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,5 +61,14 @@ public class SongController {
         for (int id: ids)
             songService.deleteSong(id);
         return new ResultBean<Map>(new HashMap());
+    }
+
+    @GetMapping(value = "/lyric/{id}")
+    public ResultBean findLyric(@PathVariable(value = "id") int id) {
+        Map<String, Object> maps = new HashMap<>();
+        String lyric = songService.findLyric(id);
+        maps.put("lyric", lyric);
+        maps.put("id", id);
+        return new ResultBean<Map>(maps);
     }
 }

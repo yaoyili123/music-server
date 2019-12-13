@@ -1,6 +1,7 @@
 package com.yaoyili.service.impl;
 
 import com.yaoyili.controller.*;
+import com.yaoyili.controller.resbeans.SheetResponse;
 import com.yaoyili.dao.*;
 import com.yaoyili.model.*;
 import com.yaoyili.service.SheetService;
@@ -34,6 +35,16 @@ public class SheetServiceImpl implements SheetService {
         List<Sheet> sheets = new ArrayList<>();
         sheets.add(sheetMapper.selectByPrimaryKey(sid));
         return sheetsConvert(sheets).get(0);
+    }
+
+    @Override
+    public List<SheetResponse> findCollections(int uid) {
+        return sheetsConvert(sheetMapper.selectCollections(uid));
+    }
+
+    @Override
+    public Boolean checkSong(int songid, int sheetid) {
+        return sheetSongMapper.selectByPrimaryKey(new SheetSongKey(songid, sheetid)) == null ? false : true;
     }
 
     @Override

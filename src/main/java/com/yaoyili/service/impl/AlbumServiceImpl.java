@@ -1,6 +1,6 @@
 package com.yaoyili.service.impl;
 
-import com.yaoyili.controller.AlbumResponse;
+import com.yaoyili.controller.resbeans.AlbumResponse;
 import com.yaoyili.dao.AlbumMapper;
 import com.yaoyili.dao.ArtistMapper;
 import com.yaoyili.model.Album;
@@ -58,6 +58,11 @@ public class AlbumServiceImpl implements AlbumService {
             return responses;
         else
             return responses.subList(0, limit);
+    }
+
+    @Override
+    public List<AlbumResponse> findCollections(int uid) {
+        return albumsConvert(albumMapper.selectCollections(uid));
     }
 
     @Override

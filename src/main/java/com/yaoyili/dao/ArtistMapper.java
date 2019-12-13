@@ -16,6 +16,8 @@ public interface ArtistMapper {
 
     Artist selectByPrimaryKey(Integer id);
 
+    List<Artist> selectCollections(int uid);
+
     List<Artist> selectByName(String name);
 
     List<Artist> selectAll(

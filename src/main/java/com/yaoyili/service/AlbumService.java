@@ -1,6 +1,6 @@
 package com.yaoyili.service;
 
-import com.yaoyili.controller.AlbumResponse;
+import com.yaoyili.controller.resbeans.AlbumResponse;
 import com.yaoyili.model.Album;
 
 import java.util.List;
@@ -16,6 +16,8 @@ public interface AlbumService {
     List<AlbumResponse> findAlbums(int page, int size, String name, int aid);
 
     List<AlbumResponse> findAlbumsByArtist(int aid);
+
+    List<AlbumResponse> findCollections(int uid);
 
     void addAlbum(Album album);
 

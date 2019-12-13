@@ -11,13 +11,16 @@ public class AccountAuth {
 
     private String nickname;
 
+    private Integer lid;
+
     public AccountAuth() { }
 
-    public AccountAuth(String username, String password, String nickname, String picurl) {
+    public AccountAuth(String username, String password, String nickname, String picurl, Integer lid) {
         this.username = username;
         this.password = password;
         this.picUrl = picurl;
         this.nickname = nickname;
+        this.lid = lid;
     }
 
     public Integer getId() {
@@ -58,5 +61,13 @@ public class AccountAuth {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public Integer getLid() {
+        return lid;
+    }
+
+    public void setLid(Integer lid) {
+        this.lid = lid;
     }
 }

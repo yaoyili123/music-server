@@ -8,8 +8,6 @@ import org.apache.ibatis.annotations.Param;
 public interface AccountAuthMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int insert(AccountAuth record);
-
     int insertSelective(AccountAuth record);
 
     AccountAuth selectByPrimaryKey(Integer id);
@@ -19,6 +17,4 @@ public interface AccountAuthMapper {
     AccountAuth checkUserAuth(@Param("username")String username,@Param("password") String password);
 
     int updateByPrimaryKeySelective(AccountAuth record);
-
-    int updateByPrimaryKey(AccountAuth record);
 }

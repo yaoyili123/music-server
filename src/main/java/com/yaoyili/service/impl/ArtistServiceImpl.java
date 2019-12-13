@@ -31,6 +31,11 @@ public class ArtistServiceImpl implements ArtistService {
     }
 
     @Override
+    public List<Artist> findCollections(int uid) {
+        return artistMapper.selectCollections(uid);
+    }
+
+    @Override
     public Artist findAritist(int id) {
         if (id < 0) {
             throw new CheckException("id不能为负数");

@@ -1,12 +1,14 @@
 package com.yaoyili.service.impl;
 
 import com.yaoyili.controller.CheckException;
-import com.yaoyili.controller.SongResponse;
+import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.dao.AlbumMapper;
 import com.yaoyili.dao.ArtistMapper;
+import com.yaoyili.dao.LyricMapper;
 import com.yaoyili.dao.SongMapper;
 import com.yaoyili.model.Album;
 import com.yaoyili.model.Artist;
+import com.yaoyili.model.Lyric;
 import com.yaoyili.model.Song;
 import com.yaoyili.service.SongService;
 import com.yaoyili.utils.Global;
@@ -27,6 +29,10 @@ public class SongServiceImpl implements SongService {
 
     @Autowired
     private AlbumMapper albumMapper;
+
+    @Autowired
+    private LyricMapper lyricMapper;
+
 
     @Override
     public int total() {
@@ -92,5 +98,16 @@ public class SongServiceImpl implements SongService {
         }
 
         return responses;
+    }
+
+    @Override
+    public String findLyric(int id) {
+        Lyric lyric =  lyricMapper.findLyric(id);
+        if (lyric == null)
+            return null;
+        else if (lyric.getLyric() == null)
+            return null;
+        else
+            return lyric.getLyric();
     }
 }

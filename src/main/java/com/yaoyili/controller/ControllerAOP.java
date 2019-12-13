@@ -1,5 +1,6 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.ResultBean;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -7,7 +8,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.sql.SQLException;
 
 /*
 * 通用controller的切面，进行异常处理、日志打印等通用过程
@@ -19,7 +21,7 @@ public class ControllerAOP {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerAOP.class);
 
-    @Pointcut("execution(public com.yaoyili.controller.ResultBean *(..))")
+    @Pointcut("execution(public com.yaoyili.controller.resbeans.ResultBean *(..))")
     void controllerHandler() {}
 
 
@@ -52,12 +54,17 @@ public class ControllerAOP {
 
     private ResultBean<?> handleException(ProceedingJoinPoint pjp, Throwable e) {
         ResultBean<?> res = new ResultBean();
-
+        e.printStackTrace();
         // 已知异常
         if (e instanceof CheckException) {
             res.setMsg(e.getLocalizedMessage());
             res.setCode(ResultBean.FAIL);
-        } else {
+        }
+        else if (e instanceof RuntimeException) {
+            res.setMsg("操作失败");
+            res.setCode(ResultBean.FAIL);
+        }
+        else {
             logger.error(pjp.getSignature() + " error ", e);
             //TODO 未知的异常，应该格外注意，可以发送邮件通知等
             res.setMsg(e.toString());

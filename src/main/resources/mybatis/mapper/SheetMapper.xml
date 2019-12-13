@@ -7,32 +7,39 @@
     <result column="uid" jdbcType="INTEGER" property="uid" />
     <result column="songNum" jdbcType="INTEGER" property="songNum" />
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
+    <result column="s" jdbcType="TINYINT" property="s" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yaoyili.model.Sheet">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
 
-  <sql id="Base_Column_List">
-    id, name, uid, songNum, picUrl
-  </sql>
-  <sql id="Blob_Column_List">
-    description
-  </sql>
+  <sql id="Base_Column_List"> id, name, uid, songNum, picUrl, s</sql>
+  <sql id="Blob_Column_List"> description </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
+    select *
     from sheet
     where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from sheet natural join sheet_collect
+    where sheet.id = sheet_collect.sid and sheet_collect.uid = #{uid,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectPublic" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select *
+    from sheet
+    where id = #{id,jdbcType=INTEGER} and s = 1
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from sheet
-    where name like "%"#{name,jdbcType=VARCHAR}"%"
+    where name like "%"#{name,jdbcType=VARCHAR}"%" and s = 1
   </select>
 
   <select id="selectByUid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -68,6 +75,9 @@
       <if test="description != null">
         description,
       </if>
+      <if test="s != null">
+        s,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -88,6 +98,9 @@
       <if test="description != null">
         #{description,jdbcType=LONGVARCHAR},
       </if>
+      <if test="s != null">
+        #{s,jdbcType=TINYINT},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Sheet">
@@ -107,6 +120,9 @@
       </if>
       <if test="description != null">
         description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="s != null">
+        s = #{s,jdbcType=TINYINT},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}

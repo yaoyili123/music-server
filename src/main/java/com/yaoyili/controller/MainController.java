@@ -1,5 +1,6 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.ResultBean;
 import com.yaoyili.service.*;
 import com.yaoyili.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;

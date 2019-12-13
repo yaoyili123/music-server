@@ -14,6 +14,8 @@ public interface ArtistService {
 
     Artist findAritist(int id);
 
+    List<Artist> findCollections(int uid);
+
     void addArtist(Artist artist);
 
     void updateArtist(Artist artist);

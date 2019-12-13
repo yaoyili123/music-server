@@ -1,8 +1,8 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.ResultBean;
 import com.yaoyili.model.Artist;
 import com.yaoyili.service.ArtistService;
-import com.yaoyili.service.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +19,11 @@ public class ArtistController {
     @GetMapping(value = "/artist/{id}")
     public ResultBean artistDetail(@PathVariable(value = "id") int id) {
         return new ResultBean<Artist>(artistService.findAritist(id));
+    }
+
+    @GetMapping(value = "/artist/collections")
+    public ResultBean findCollections(@RequestParam(value = "uid") int uid) {
+        return new ResultBean<List<Artist>>(artistService.findCollections(uid));
     }
 
     @GetMapping(value = "/artists")

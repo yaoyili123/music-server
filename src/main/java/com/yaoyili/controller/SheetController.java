@@ -1,5 +1,7 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.ResultBean;
+import com.yaoyili.controller.resbeans.SheetResponse;
 import com.yaoyili.service.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +30,25 @@ public class SheetController {
         return new ResultBean<List<SheetResponse>>(sheetService.findSheets(uid));
     }
 
+
     @GetMapping(value = "/sheet/{sid}")
     public ResultBean findSheet(@PathVariable(value = "sid") int sid) {
         return new ResultBean<SheetResponse>(sheetService.findSheet(sid));
     }
+
+    @GetMapping(value = "/sheet/collections")
+    public ResultBean findCollections(@RequestParam(value = "uid") int uid) {
+        return new ResultBean<List<SheetResponse>>(sheetService.findCollections(uid));
+    }
+
+    @GetMapping(value = "/checkSong")
+    public ResultBean checkSong(
+            @RequestParam(value = "songid") int songid,
+            @RequestParam(value = "sheetid") int sheetid) {
+        return new ResultBean<Boolean>(sheetService.checkSong(songid, sheetid));
+    }
+
+
 
     @PostMapping(value = "updateSheet")
     public ResultBean updateSheet(

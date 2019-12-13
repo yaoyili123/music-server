@@ -1,8 +1,9 @@
 package com.yaoyili.controller;
 
+import com.yaoyili.controller.resbeans.AlbumResponse;
+import com.yaoyili.controller.resbeans.ResultBean;
 import com.yaoyili.model.Album;
 import com.yaoyili.service.AlbumService;
-import com.yaoyili.service.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,11 @@ public class AlbumController {
         else
             res.setTotal(((List)res.getData()).size());
         return res;
+    }
+
+    @GetMapping(value = "/album/collections")
+    public ResultBean findCollections(@RequestParam(value = "uid") int uid) {
+        return new ResultBean<List<AlbumResponse>>(albumService.findCollections(uid));
     }
 
     @PostMapping(value = "/album/update")

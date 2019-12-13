@@ -1,6 +1,6 @@
 package com.yaoyili.dao;
 
-import com.yaoyili.controller.SongResponse;
+import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.model.Song;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
