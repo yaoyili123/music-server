@@ -17,15 +17,18 @@ public class Sheet {
 
     private Boolean s = true;
 
+    private Long play;
+
     public Sheet() {}
 
-    public Sheet(Integer id, String name, Integer uid, Integer songNum, String picUrl, String description) {
+    public Sheet(Integer id, String name, Integer uid, Integer songNum, String picUrl, String description, Long play) {
         this.id = id;
         this.name = name;
         this.uid = uid;
         this.picUrl = picUrl;
         this.songNum = songNum;
         this.description = description;
+        this.play = play;
     }
 
     public Integer getId() {
@@ -82,5 +85,13 @@ public class Sheet {
 
     public void setS(Boolean show) {
         this.s = show;
+    }
+
+    public Long getPlay() {
+        return play;
+    }
+
+    public void setPlay(Long play) {
+        this.play = play;
     }
 }

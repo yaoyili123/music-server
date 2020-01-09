@@ -1,6 +1,7 @@
 package com.yaoyili.controller;
 
 import com.yaoyili.controller.resbeans.ResultBean;
+import com.yaoyili.controller.resbeans.SongLyric;
 import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.model.Song;
 import com.yaoyili.service.SongService;
@@ -39,13 +40,13 @@ public class SongController {
     }
 
     @PostMapping(value = "/song/update")
-    public ResultBean updateSong(@RequestBody Song song) {
+    public ResultBean updateSong(@RequestBody SongLyric song) {
         songService.updateSong(song);
         return new ResultBean<Map>(new HashMap());
     }
 
     @PostMapping(value = "/song/add")
-    public ResultBean addSong(@RequestBody Song song) {
+    public ResultBean addSong(@RequestBody SongLyric song) {
         songService.addSong(song);
         return new ResultBean<Map>(new HashMap());
     }

@@ -29,4 +29,11 @@ public interface AlbumMapper {
     List<Album> selectByAid(Integer id);
 
     int updateByPrimaryKeySelective(Album record);
+
+    int updatePlayTimes(@Param("id") int id, @Param("times") long times);
+
+    int updateIncr(@Param("id") int id, @Param("incr") long incr);
+
+    List<Album> selectRank(int n);
+
 }

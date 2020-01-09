@@ -7,11 +7,13 @@ import com.yaoyili.model.Album;
 import com.yaoyili.model.Artist;
 import com.yaoyili.service.AlbumService;
 import com.yaoyili.utils.Global;
+import com.yaoyili.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AlbumServiceImpl implements AlbumService {
@@ -21,6 +23,9 @@ public class AlbumServiceImpl implements AlbumService {
 
     @Autowired
     private ArtistMapper artistMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Override
     public int total() {
@@ -93,4 +98,59 @@ public class AlbumServiceImpl implements AlbumService {
         return responses;
     }
 
+    @Override
+    public List<AlbumResponse> getRank() {
+        List<AlbumResponse> albums = null;
+        String rKey = "album:rank";
+        if (!redisUtils.hasKey(rKey)) {
+            albums = albumsConvert(albumMapper.selectRank(Global.RANK_LENGTH));
+            Set<ZSetOperations.TypedTuple<Object>> tuples
+                    = new HashSet<ZSetOperations.TypedTuple<Object>>();
+            for (AlbumResponse album : albums) {
+                ZSetOperations.TypedTuple<Object> objectTypedTuple
+                        = new DefaultTypedTuple<Object>(album, (double)album.getPlay());
+                tuples.add(objectTypedTuple);
+            }
+            long len = redisUtils.zadds(rKey, tuples);
+            Collections.sort(albums, (s1, s2) -> s2.getPlay().compareTo(s1.getPlay()));
+        }
+        else {
+            albums = new ArrayList<>(redisUtils.zrevrange(rKey, 0, Global.RANK_LENGTH));
+        }
+        return albums;
+    }
+
+    @Override
+    public void updateRank() {
+        String rKey = "album:rank";
+        List<AlbumResponse> albums = albumsConvert(albumMapper.selectRank(Global.RANK_LENGTH));
+        redisUtils.del(rKey);
+        Set<ZSetOperations.TypedTuple<Object>> tuples
+                = new HashSet<ZSetOperations.TypedTuple<Object>>();
+        for (AlbumResponse album : albums) {
+            ZSetOperations.TypedTuple<Object> objectTypedTuple
+                    = new DefaultTypedTuple<Object>(album, (double)album.getPlay());
+            tuples.add(objectTypedTuple);
+        }
+        redisUtils.zadds(rKey, tuples);
+    }
+
+    @Override
+    public void incr(Integer id) {
+        String key = "album:" + id.toString() + ":incr";
+        redisUtils.incr(key, 1);
+    }
+
+    @Override
+    public void updatePlay() {
+        Set<String> keys = redisUtils.keys("album:*:incr");
+        List<Integer> values = redisUtils.mget(keys);
+        int idx = 0;
+        for (String key : keys) {
+            int incr = values.get(idx++);
+            int id = Integer.parseInt(key.substring(6, key.length()-5));
+            albumMapper.updateIncr(id, incr);
+        }
+        redisUtils.del(keys);
+    }
 }

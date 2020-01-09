@@ -3,7 +3,6 @@ package com.yaoyili.controller.resbeans;
 import com.yaoyili.model.Song;
 import lombok.Data;
 
-@Data
 public class SongResponse extends Song{
 
     private String albumName;
@@ -37,6 +36,38 @@ public class SongResponse extends Song{
         this.albumName = albumName;
         this.albumUrl = albumUrl;
         this.artistId = artistId;
+        this.author = author;
+    }
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
+    }
+
+    public String getAlbumUrl() {
+        return albumUrl;
+    }
+
+    public void setAlbumUrl(String albumUrl) {
+        this.albumUrl = albumUrl;
+    }
+
+    public Integer getArtistId() {
+        return artistId;
+    }
+
+    public void setArtistId(Integer artistId) {
+        this.artistId = artistId;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
         this.author = author;
     }
 }

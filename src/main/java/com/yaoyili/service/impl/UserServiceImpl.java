@@ -162,4 +162,9 @@ public class UserServiceImpl implements UserService {
     public Boolean checkHavedSheet(int uid, int sid) {
         return sheetMapper.selectByPrimaryKey(sid).getUid() == uid ? true : false;
     }
+
+    @Override
+    public AccountAuth getUserInfo(int uid) {
+        return accountAuthMapper.selectByPrimaryKey(uid);
+    }
 }

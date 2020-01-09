@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-@Data
 public class SheetResponse extends Sheet {
 
     private String username;
@@ -18,7 +17,15 @@ public class SheetResponse extends Sheet {
     }
 
     public SheetResponse(Sheet sheet, String username) {
-        super(sheet.getId(), sheet.getName(), sheet.getUid(), sheet.getSongNum(), sheet.getPicUrl(), sheet.getDescription());
+        super(sheet.getId(), sheet.getName(), sheet.getUid(), sheet.getSongNum(), sheet.getPicUrl(), sheet.getDescription(), sheet.getPlay());
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
         this.username = username;
     }
 }

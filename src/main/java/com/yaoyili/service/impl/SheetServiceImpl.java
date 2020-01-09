@@ -6,12 +6,14 @@ import com.yaoyili.dao.*;
 import com.yaoyili.model.*;
 import com.yaoyili.service.SheetService;
 import com.yaoyili.utils.Global;
+import com.yaoyili.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.DefaultTypedTuple;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SheetServiceImpl implements SheetService {
@@ -24,6 +26,9 @@ public class SheetServiceImpl implements SheetService {
 
     @Autowired
     private SheetSongMapper sheetSongMapper;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Override
     public List<SheetResponse> findSheets(int uid) {
@@ -59,6 +64,8 @@ public class SheetServiceImpl implements SheetService {
 
     @Override
     public SheetResponse addSheet(String name, int uid) {
+        if (name == null || name.isEmpty())
+            throw new CheckException("名字不能为空");
         Sheet sheet = new Sheet();
         sheet.setName(name);
         sheet.setPicUrl(Global.HOST_NAME + '/' + Global.DEAFAULT_SHEETPIC);
@@ -113,5 +120,63 @@ public class SheetServiceImpl implements SheetService {
         }
 
         return responses;
+    }
+
+    @Override
+    public List<SheetResponse> getRank() {
+        List<SheetResponse> sheets = null;
+        String rKey = "sheet:rank";
+        if (!redisUtils.hasKey(rKey)) {
+            sheets = sheetsConvert(sheetMapper.selectRank(Global.RANK_LENGTH));
+            Set<ZSetOperations.TypedTuple<Object>> tuples
+                    = new HashSet<ZSetOperations.TypedTuple<Object>>();
+            for (SheetResponse sheet : sheets) {
+                ZSetOperations.TypedTuple<Object> objectTypedTuple
+                        = new DefaultTypedTuple<Object>(sheet, (double)sheet.getPlay());
+                tuples.add(objectTypedTuple);
+            }
+            long len = redisUtils.zadds(rKey, tuples);
+            Collections.sort(sheets, (s1, s2) -> s2.getPlay().compareTo(s1.getPlay()));
+        }
+        else {
+            sheets = new ArrayList<>(redisUtils.zrevrange(rKey, 0, Global.RANK_LENGTH));
+        }
+        return sheets;
+    }
+
+    @Override
+    public void updateRank() {
+        String rKey = "sheet:rank";
+        List<SheetResponse> sheets = sheetsConvert(sheetMapper.selectRank(Global.RANK_LENGTH));
+        redisUtils.del(rKey);
+        Set<ZSetOperations.TypedTuple<Object>> tuples
+                = new HashSet<ZSetOperations.TypedTuple<Object>>();
+        for (SheetResponse sheet : sheets) {
+            ZSetOperations.TypedTuple<Object> objectTypedTuple
+                    = new DefaultTypedTuple<Object>(sheet, (double)sheet.getPlay());
+            tuples.add(objectTypedTuple);
+        }
+        redisUtils.zadds(rKey, tuples);
+    }
+
+    @Override
+    public void incr(Integer id) {
+        String key = "sheet:" + id.toString() + ":incr";
+        redisUtils.incr(key, 1);
+    }
+
+    @Override
+    public void updatePlay() {
+        Set<String> keys = redisUtils.keys("sheet:*:incr");
+        List<Integer> values = redisUtils.mget(keys);
+        int idx = 0;
+
+        for (String key : keys) {
+            int incr = values.get(idx++);
+            int id = Integer.parseInt(key.substring(6, key.length()-5));
+            sheetMapper.updateIncr(id, incr);
+        }
+
+        redisUtils.del(keys);
     }
 }

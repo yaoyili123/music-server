@@ -1,18 +1,16 @@
 package com.yaoyili.model;
 
 public class Lyric {
-    private Integer id;
 
     private Integer sid;
 
     private String lyric;
 
-    public Integer getId() {
-        return id;
-    }
+    public Lyric() {}
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Lyric(Integer sid, String lyric) {
+        this.sid = sid;
+        this.lyric = lyric;
     }
 
     public Integer getSid() {

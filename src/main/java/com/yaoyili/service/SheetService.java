@@ -9,6 +9,12 @@ public interface SheetService {
 
     List<SheetResponse> findSheetbyName(String name, int limit);
 
+    List<SheetResponse> getRank();
+
+    void updateRank();
+
+    void updatePlay();
+
     List<SheetResponse> findCollections(int uid);
 
     SheetResponse addSheet(String name, int uid);
@@ -26,4 +32,6 @@ public interface SheetService {
     void addSongToSheet(int songId, int sheetId);
 
     void deleteSongFromSheet(int songId, int sheetId);
+
+    void incr(Integer id);
 }

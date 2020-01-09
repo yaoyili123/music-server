@@ -25,6 +25,12 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    @GetMapping(value = "userInfo")
+    public ResultBean getUserInfo(
+            @RequestParam(value = "uid") int uid) {
+        return new ResultBean<AccountAuth>(userService.getUserInfo(uid));
+    }
+
     @PostMapping(value = "register")
     public ResultBean register(
             @RequestParam(value = "username") String username,

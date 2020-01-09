@@ -1,5 +1,6 @@
 package com.yaoyili.service;
 
+import com.yaoyili.controller.resbeans.SongLyric;
 import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.model.Lyric;
 import com.yaoyili.model.Song;
@@ -16,9 +17,9 @@ public interface SongService {
 
     List<SongResponse> findSongs(int aid, String type);
 
-    void addSong(Song song);
+    void addSong(SongLyric song);
 
-    void updateSong(Song song);
+    void updateSong(SongLyric song);
 
     void deleteSong(int id);
 

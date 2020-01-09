@@ -1,6 +1,7 @@
 package com.yaoyili.service.impl;
 
 import com.yaoyili.controller.CheckException;
+import com.yaoyili.controller.resbeans.SongLyric;
 import com.yaoyili.controller.resbeans.SongResponse;
 import com.yaoyili.dao.AlbumMapper;
 import com.yaoyili.dao.ArtistMapper;
@@ -73,13 +74,15 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public void addSong(Song song) {
+    public void addSong(SongLyric song) {
         songMapper.insertSelective(song);
+        lyricMapper.insert(new Lyric(song.getId(), song.getLyric()));
     }
 
     @Override
-    public void updateSong(Song song) {
+    public void updateSong(SongLyric song) {
         songMapper.updateByPrimaryKeySelective(song);
+        lyricMapper.updateByPrimaryKey(new Lyric(song.getId(), song.getLyric()));
     }
 
     @Override
@@ -102,7 +105,7 @@ public class SongServiceImpl implements SongService {
 
     @Override
     public String findLyric(int id) {
-        Lyric lyric =  lyricMapper.findLyric(id);
+        Lyric lyric =  lyricMapper.selectByPrimaryKey(id);
         if (lyric == null)
             return null;
         else if (lyric.getLyric() == null)

@@ -4,91 +4,35 @@
   <resultMap id="BaseResultMap" type="com.yaoyili.model.Lyric">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="sid" jdbcType="INTEGER" property="sid" />
-  </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yaoyili.model.Lyric">
     <result column="lyric" jdbcType="LONGVARCHAR" property="lyric" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, sid
-  </sql>
-  <sql id="Blob_Column_List">
-    lyric
+    sid, lyric
   </sql>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from lyric
-    where id = #{id,jdbcType=INTEGER}
-  </select>
-
-  <select id="findLyric" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from lyric
     where sid = #{sid,jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from lyric
-    where id = #{id,jdbcType=INTEGER}
+    where sid = #{sid,jdbcType=INTEGER}
   </delete>
+
   <insert id="insert" parameterType="com.yaoyili.model.Lyric">
-    insert into lyric (id, sid, lyric
+    insert into lyric (sid, lyric
       )
-    values (#{id,jdbcType=INTEGER}, #{sid,jdbcType=INTEGER}, #{lyric,jdbcType=LONGVARCHAR}
+    values (#{sid,jdbcType=INTEGER}, #{lyric,jdbcType=LONGVARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.yaoyili.model.Lyric">
-    insert into lyric
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
-      <if test="sid != null">
-        sid,
-      </if>
-      <if test="lyric != null">
-        lyric,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="sid != null">
-        #{sid,jdbcType=INTEGER},
-      </if>
-      <if test="lyric != null">
-        #{lyric,jdbcType=LONGVARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Lyric">
-    update lyric
-    <set>
-      <if test="sid != null">
-        sid = #{sid,jdbcType=INTEGER},
-      </if>
-      <if test="lyric != null">
-        lyric = #{lyric,jdbcType=LONGVARCHAR},
-      </if>
-    </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yaoyili.model.Lyric">
-    update lyric
-    set sid = #{sid,jdbcType=INTEGER},
-      lyric = #{lyric,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
   <update id="updateByPrimaryKey" parameterType="com.yaoyili.model.Lyric">
     update lyric
-    set sid = #{sid,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+    set lyric = #{lyric,jdbcType=LONGVARCHAR}
+    where sid = #{sid,jdbcType=INTEGER}
   </update>
+
 </mapper>

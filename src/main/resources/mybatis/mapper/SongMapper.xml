@@ -86,7 +86,7 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
 
-  <insert id="insertSelective" parameterType="com.yaoyili.model.Song">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.yaoyili.model.Song">
     insert into song
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

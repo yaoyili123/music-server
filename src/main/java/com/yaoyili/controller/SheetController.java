@@ -84,4 +84,15 @@ public class SheetController {
         sheetService.deleteSongFromSheet(songId, sheetId);
         return new ResultBean<Map>(new HashMap());
     }
+
+    @PostMapping(value = "/sheet/play")
+    public ResultBean incr(@RequestParam(value = "id") int id) {
+        sheetService.incr(id);
+        return new ResultBean<Map>(new HashMap());
+    }
+
+    @GetMapping(value = "/sheet/rank")
+    public ResultBean getRank() {
+        return new ResultBean<List>(sheetService.getRank());
+    }
 }

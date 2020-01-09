@@ -11,14 +11,17 @@ public class Album{
 
     private String company;
 
+    private Long play;
+
     public Album() {}
 
-    public Album(Integer id, Integer artistId, String picUrl, String name, String company) {
+    public Album(Integer id, Integer artistId, String picUrl, String name, String company, Long play) {
         this.id = id;
         this.artistId = artistId;
         this.picUrl = picUrl;
         this.name = name;
         this.company = company;
+        this.play = play;
     }
 
     public Integer getId() {
@@ -59,5 +62,13 @@ public class Album{
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public Long getPlay() {
+        return play;
+    }
+
+    public void setPlay(Long play) {
+        this.play = play;
     }
 }

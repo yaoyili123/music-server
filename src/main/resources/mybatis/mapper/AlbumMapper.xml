@@ -7,14 +7,21 @@
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="company" jdbcType="VARCHAR" property="company" />
+    <result column="play" jdbcType="INTEGER" property="play" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, artistId, picUrl, name, company
+    id, artistId, picUrl, name, company, play
   </sql>
 
   <select id="total" resultType="java.lang.Integer">
     select count(*)
     from album
+  </select>
+
+  <select id="selectRank" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from album
+    ORDER BY play DESC limit #{n,jdbcType=INTEGER}
   </select>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -120,6 +127,18 @@
         company = #{company,jdbcType=VARCHAR},
       </if>
     </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updatePlayTimes">
+    update album
+    set play = #{times,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateIncr">
+    update album
+    set play = play + #{incr,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

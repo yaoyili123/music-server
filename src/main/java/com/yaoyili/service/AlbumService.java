@@ -9,6 +9,10 @@ public interface AlbumService {
 
     int total();
 
+    List<AlbumResponse> getRank();
+
+    void updateRank();
+
     List<AlbumResponse> findAlbumbyName(String name, int limit);
 
     AlbumResponse findAlbum(int id);
@@ -24,4 +28,8 @@ public interface AlbumService {
     void updateAlbum(Album album);
 
     void delAlbum(Integer id);
+
+    void incr(Integer id);
+
+    void updatePlay();
 }

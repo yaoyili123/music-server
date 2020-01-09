@@ -20,5 +20,7 @@ public interface UserService {
 
     public Boolean checkHavedSheet(int uid, int sid);
 
-    public List findCollections(int tid, int uid);
+//    public List findCollections(int tid, int uid);
+
+    public AccountAuth getUserInfo(int uid);
 }

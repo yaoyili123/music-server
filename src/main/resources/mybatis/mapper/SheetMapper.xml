@@ -8,12 +8,13 @@
     <result column="songNum" jdbcType="INTEGER" property="songNum" />
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
     <result column="s" jdbcType="TINYINT" property="s" />
+    <result column="play" jdbcType="INTEGER" property="play" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yaoyili.model.Sheet">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
 
-  <sql id="Base_Column_List"> id, name, uid, songNum, picUrl, s</sql>
+  <sql id="Base_Column_List"> id, name, uid, songNum, picUrl, s, play</sql>
   <sql id="Blob_Column_List"> description </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
@@ -22,10 +23,16 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
 
+  <select id="selectRank" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from sheet
+    where s = 1
+    ORDER BY play DESC limit #{n,jdbcType=INTEGER}
+  </select>
+
   <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from sheet natural join sheet_collect
+    select id, name, sheet.uid, songNum, picUrl, s, description, play
+    from sheet join sheet_collect
     where sheet.id = sheet_collect.sid and sheet_collect.uid = #{uid,jdbcType=INTEGER}
   </select>
 
@@ -125,6 +132,18 @@
         s = #{s,jdbcType=TINYINT},
       </if>
     </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updatePlayTimes">
+    update sheet
+    set play = #{times,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateIncr">
+    update sheet
+    set play = play + #{incr,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
 

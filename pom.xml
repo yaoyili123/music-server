@@ -94,6 +94,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!--利用@ConfigurationProperties来生成配置元数据，会在编译时调用-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

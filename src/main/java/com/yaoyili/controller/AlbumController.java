@@ -72,4 +72,15 @@ public class AlbumController {
             albumService.delAlbum(id);
         return new ResultBean<Map>(new HashMap());
     }
+
+    @PostMapping(value = "/album/play")
+    public ResultBean incr(@RequestParam(value = "id") int id) {
+        albumService.incr(id);
+        return new ResultBean<Map>(new HashMap());
+    }
+
+    @GetMapping(value = "/album/rank")
+    public ResultBean getRank() {
+        return new ResultBean<List>(albumService.getRank());
+    }
 }
