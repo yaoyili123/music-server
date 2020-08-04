@@ -1,4 +1,4 @@
-package com.yaoyili.controller;
+package com.yaoyili.config;
 
 import com.yaoyili.tasks.UpdatePlayJob;
 import com.yaoyili.tasks.UpdateRankJob;

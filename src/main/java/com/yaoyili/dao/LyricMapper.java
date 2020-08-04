@@ -5,11 +5,12 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface LyricMapper {
-    int deleteByPrimaryKey(Integer id);
+
+    int delete(Long id);
 
     int insert(Lyric record);
 
-    Lyric selectByPrimaryKey(Integer id);
+    Lyric select(Long id);
 
-    int updateByPrimaryKey(Lyric record);
+    int update(Lyric record);
 }

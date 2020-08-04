@@ -1,8 +1,7 @@
 package com.yaoyili.controller;
 
-import com.yaoyili.controller.resbeans.ResultBean;
-import com.yaoyili.controller.resbeans.SongLyric;
-import com.yaoyili.controller.resbeans.SongResponse;
+import com.yaoyili.controller.ao.ResultBean;
+import com.yaoyili.controller.ao.SongLyric;
 import com.yaoyili.model.Song;
 import com.yaoyili.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +12,20 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping(value = "/song")
 public class SongController {
 
     @Autowired
     private SongService songService;
 
-    @GetMapping(value = "/songs")
-    public ResultBean findAllSongs(
+    @GetMapping(value = "/all")
+    public ResultBean find(
             @RequestParam(value = "page", required = false, defaultValue = "-1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "-1") int size,
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "aid", required = false, defaultValue = "-1") int aid) {
-        ResultBean res = new ResultBean<List<SongResponse>>();
-        res.setData(songService.findSongsAll(page, size, name, aid));
+            @RequestParam(value = "aid", required = false, defaultValue = "-1") Long aid) {
+        ResultBean res = new ResultBean<List<Song>>();
+        res.setData(songService.find(page, size, name, aid));
         if (aid == -1)
             res.setTotal(songService.total());
         else
@@ -33,39 +33,44 @@ public class SongController {
         return res;
     }
 
-    @GetMapping(value = "/songs/{id}")
-    public ResultBean findSongs(@PathVariable(value = "id") int id,
+    @GetMapping(value = "/{id}")
+    public ResultBean find(@PathVariable(value = "id") Long id) {
+        return new ResultBean<Song>(songService.find(id));
+    }
+
+    @GetMapping(value = "/set/{id}")
+    public ResultBean find(@PathVariable(value = "id") Long id,
                                 @RequestParam(value = "type") String type) {
-        return new ResultBean<List<SongResponse>>(songService.findSongs(id, type));
+        return new ResultBean<List<Song>>(songService.find(id, type));
     }
 
-    @PostMapping(value = "/song/update")
-    public ResultBean updateSong(@RequestBody SongLyric song) {
-        songService.updateSong(song);
+    @PostMapping(value = "/update")
+    public ResultBean update(@RequestBody SongLyric song) {
+        songService.update(song);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @PostMapping(value = "/song/add")
-    public ResultBean addSong(@RequestBody SongLyric song) {
-        songService.addSong(song);
+    @PostMapping(value = "/add")
+    public ResultBean add(@RequestBody SongLyric song) {
+        songService.add(song);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @GetMapping(value = "/song/del/{id}")
-    public ResultBean delSong(@PathVariable Integer id) {
-        songService.deleteSong(id);
+    @GetMapping(value = "/del/{id}")
+    public ResultBean del(@PathVariable Long id) {
+        songService.del(id);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @PostMapping(value = "/song/del")
-    public ResultBean delSongs(@RequestBody Integer[] ids) {
-        for (int id: ids)
-            songService.deleteSong(id);
+    @PostMapping(value = "/dels")
+    public ResultBean delSongs(@RequestBody Long[] ids) {
+        for (Long id: ids)
+            songService.del(id);
         return new ResultBean<Map>(new HashMap());
     }
 
     @GetMapping(value = "/lyric/{id}")
-    public ResultBean findLyric(@PathVariable(value = "id") int id) {
+    public ResultBean findLyric(@PathVariable(value = "id") Long id) {
         Map<String, Object> maps = new HashMap<>();
         String lyric = songService.findLyric(id);
         maps.put("lyric", lyric);

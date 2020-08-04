@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.ArtistMapper">
   <resultMap id="BaseResultMap" type="com.yaoyili.model.Artist">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="albumSize" jdbcType="INTEGER" property="albumSize" />
@@ -11,18 +11,18 @@
   <sql id="Base_Column_List">
     id, picUrl, name, albumSize, musicSize
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from artist
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectCollections" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from artist natural join artist_collect
-    where artist.id = artist_collect.aid and artist_collect.uid = #{uid,jdbcType=INTEGER}
+    where artist.id = artist_collect.aid and artist_collect.uid = #{uid,jdbcType=BIGINT}
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -49,12 +49,12 @@
     </if>
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="delete" parameterType="java.lang.Long">
     delete from artist
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
-  <insert id="insertSelective" parameterType="com.yaoyili.model.Artist">
+  <insert id="insert" parameterType="com.yaoyili.model.Artist">
     insert into artist
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -75,7 +75,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="picUrl != null">
         #{picUrl,jdbcType=VARCHAR},
@@ -91,7 +91,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Artist">
+  <update id="update" parameterType="com.yaoyili.model.Artist">
     update artist
     <set>
       <if test="picUrl != null">
@@ -107,6 +107,6 @@
         musicSize = #{musicSize,jdbcType=INTEGER},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

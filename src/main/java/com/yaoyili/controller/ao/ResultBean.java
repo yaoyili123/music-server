@@ -1,12 +1,12 @@
-package com.yaoyili.controller.resbeans;
+package com.yaoyili.controller.ao;
 
 
 import lombok.Data;
-
-import java.util.HashMap;
+import lombok.NoArgsConstructor;
 
 /*用于业务逻辑API响应*/
 @Data
+@NoArgsConstructor
 public class ResultBean<T> {
 
     public static final int SUCCESS = 0;
@@ -24,10 +24,6 @@ public class ResultBean<T> {
     private String msg = "success";
 
     private T data;
-
-    public ResultBean() {
-        super();
-    }
 
     public ResultBean(T data) {
         super();

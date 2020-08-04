@@ -1,7 +1,14 @@
 package com.yaoyili.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountAuth {
-    private Integer id;
+    private Long id;
 
     private String username;
 
@@ -11,63 +18,13 @@ public class AccountAuth {
 
     private String nickname;
 
-    private Integer lid;
+    private Long lid;
 
-    public AccountAuth() { }
-
-    public AccountAuth(String username, String password, String nickname, String picurl, Integer lid) {
+    public AccountAuth(String username, String password, String picUrl, String nickname, Long lid) {
         this.username = username;
         this.password = password;
-        this.picUrl = picurl;
+        this.picUrl = picUrl;
         this.nickname = nickname;
-        this.lid = lid;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPicUrl() {
-        return picUrl;
-    }
-
-    public void setPicUrl(String picurl) {
-        this.picUrl = picurl;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public Integer getLid() {
-        return lid;
-    }
-
-    public void setLid(Integer lid) {
         this.lid = lid;
     }
 }

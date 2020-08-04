@@ -2,42 +2,41 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.SheetSongMapper">
   <resultMap id="BaseResultMap" type="com.yaoyili.model.SheetSongKey">
-    <id column="songid" jdbcType="INTEGER" property="songid" />
-    <id column="sheetid" jdbcType="INTEGER" property="sheetid" />
+    <id column="songid" jdbcType="BIGINT" property="songid" />
+    <id column="sheetid" jdbcType="BIGINT" property="sheetid" />
   </resultMap>
 
-  <select id="selectByPrimaryKey" parameterType="com.yaoyili.model.SheetSongKey" resultMap="BaseResultMap">
+  <select id="select" parameterType="com.yaoyili.model.SheetSongKey" resultMap="BaseResultMap">
     select * from sheet_song
-    where songid = #{songid,jdbcType=INTEGER}
-      and sheetid = #{sheetid,jdbcType=INTEGER}
+    where songid = #{songid,jdbcType=BIGINT}
+      and sheetid = #{sheetid,jdbcType=BIGINT}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="com.yaoyili.model.SheetSongKey">
+  <select id="selectBySong" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select * from sheet_song
+    where songid = #{songid,jdbcType=BIGINT}
+  </select>
+
+  <delete id="delete" parameterType="com.yaoyili.model.SheetSongKey">
     delete from sheet_song
-    where songid = #{songid,jdbcType=INTEGER}
-      and sheetid = #{sheetid,jdbcType=INTEGER}
+    where songid = #{songid,jdbcType=BIGINT}
+      and sheetid = #{sheetid,jdbcType=BIGINT}
   </delete>
+
+  <!--不能用这个方法，因为无法这样无法获取歌单ID列表，从而无法改变歌单的songNum列-->
+  <!--<delete id="deleteBySong" parameterType="java.lang.Long">-->
+    <!--delete from sheet_song-->
+    <!--where songid = #{songid,jdbcType=BIGINT}-->
+  <!--</delete>-->
+
+  <delete id="deleteBySheet" parameterType="java.lang.Long">
+    delete from sheet_song
+    where sheetid = #{sheetid,jdbcType=BIGINT}
+  </delete>
+
   <insert id="insert" parameterType="com.yaoyili.model.SheetSongKey">
     insert into sheet_song (songid, sheetid)
-    values (#{songid,jdbcType=INTEGER}, #{sheetid,jdbcType=INTEGER})
+    values (#{songid,jdbcType=BIGINT}, #{sheetid,jdbcType=BIGINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.yaoyili.model.SheetSongKey">
-    insert into sheet_song
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="songid != null">
-        songid,
-      </if>
-      <if test="sheetid != null">
-        sheetid,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="songid != null">
-        #{songid,jdbcType=INTEGER},
-      </if>
-      <if test="sheetid != null">
-        #{sheetid,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
+
 </mapper>

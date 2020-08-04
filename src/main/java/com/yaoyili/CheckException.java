@@ -1,7 +1,7 @@
-package com.yaoyili.controller;
+package com.yaoyili;
 
 /*
-* 需要服务端提示的错误
+*
 * */
 public class CheckException extends RuntimeException {
 

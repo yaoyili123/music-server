@@ -2,45 +2,36 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.AlbumCollectMapper">
   <resultMap id="BaseResultMap" type="com.yaoyili.model.AlbumCollectKey">
-    <id column="uid" jdbcType="INTEGER" property="uid" />
-    <id column="aid" jdbcType="INTEGER" property="aid" />
+    <id column="uid" jdbcType="BIGINT" property="uid" />
+    <id column="aid" jdbcType="BIGINT" property="aid" />
   </resultMap>
 
   <select id="check" parameterType="com.yaoyili.model.AlbumCollectKey" resultMap="BaseResultMap">
     select * from album_collect
-    where uid = #{uid,jdbcType=INTEGER}
-      and aid = #{aid,jdbcType=INTEGER}
+    where uid = #{uid,jdbcType=BIGINT}
+      and aid = #{aid,jdbcType=BIGINT}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="com.yaoyili.model.AlbumCollectKey">
+  <delete id="delete" parameterType="com.yaoyili.model.AlbumCollectKey">
     delete from album_collect
-    where uid = #{uid,jdbcType=INTEGER}
-      and aid = #{aid,jdbcType=INTEGER}
+    where uid = #{uid,jdbcType=BIGINT}
+      and aid = #{aid,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByAlbum" parameterType="java.lang.Long">
+    delete from album_collect
+    where aid = #{aid,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByUser" parameterType="java.lang.Long">
+    delete from album_collect
+    where uid = #{uid,jdbcType=BIGINT}
   </delete>
 
   <insert id="insert" parameterType="com.yaoyili.model.AlbumCollectKey">
     insert into album_collect (uid, aid)
-    values (#{uid,jdbcType=INTEGER}, #{aid,jdbcType=INTEGER})
+    values (#{uid,jdbcType=BIGINT}, #{aid,jdbcType=BIGINT})
   </insert>
 
-  <insert id="insertSelective" parameterType="com.yaoyili.model.AlbumCollectKey">
-    insert into album_collect
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="uid != null">
-        uid,
-      </if>
-      <if test="aid != null">
-        aid,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="uid != null">
-        #{uid,jdbcType=INTEGER},
-      </if>
-      <if test="aid != null">
-        #{aid,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
 
 </mapper>

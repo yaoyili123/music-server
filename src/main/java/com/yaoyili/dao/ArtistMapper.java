@@ -8,15 +8,16 @@ import java.util.List;
 
 @Mapper
 public interface ArtistMapper {
-    int deleteByPrimaryKey(Integer id);
 
-    int insertSelective(Artist record);
+    int delete(Long id);
+
+    int insert(Artist record);
 
     int total();
 
-    Artist selectByPrimaryKey(Integer id);
+    Artist select(Long id);
 
-    List<Artist> selectCollections(int uid);
+    List<Artist> selectCollections(Long uid);
 
     List<Artist> selectByName(String name);
 
@@ -25,5 +26,5 @@ public interface ArtistMapper {
             @Param("size") int pageSize,
             @Param("name")String filterName);
 
-    int updateByPrimaryKeySelective(Artist record);
+    int update(Artist record);
 }

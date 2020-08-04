@@ -11,24 +11,26 @@ public interface AlbumMapper {
 
     int total();
 
-    int deleteByPrimaryKey(Integer id);
+    int delete(Long id);
 
-    int insertSelective(Album record);
+    int deleteByArtist(Long aid);
+
+    int insert(Album record);
 
     List<Album> selectByName(String name);
 
-    List<Album> selectCollections(int uid);
+    List<Album> selectCollections(Long uid);
 
     List<Album> selectAll(@Param("offset") int offset,
                           @Param("size") int pageSize,
                           @Param("name")String filterName,
-                          @Param("artistId")int aid);
+                          @Param("artistId")long aid);
 
-    Album selectByPrimaryKey(Integer id);
+    Album select(Long id);
 
-    List<Album> selectByAid(Integer id);
+    List<Album> selectByAid(Long id);
 
-    int updateByPrimaryKeySelective(Album record);
+    int update(Album record);
 
     int updatePlayTimes(@Param("id") int id, @Param("times") long times);
 

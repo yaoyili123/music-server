@@ -8,9 +8,11 @@ public interface ArtistCollectMapper {
 
     ArtistCollectKey check(ArtistCollectKey key);
 
-    int deleteByPrimaryKey(ArtistCollectKey key);
+    int delete(ArtistCollectKey key);
+
+    int deleteByArtist(Long aid);
+
+    int deleteByUser(Long uid);
 
     int insert(ArtistCollectKey record);
-
-    int insertSelective(ArtistCollectKey record);
 }

@@ -12,15 +12,17 @@ public interface UserService {
 
     public AccountAuth login(String username, String password);
 
-    public void collect(int uid, int rid, int t);
+    public void collect(Long uid, Long rid, int t);
 
-    public void uncollect(int uid, int rid, int t);
+    public void uncollect(Long uid, Long rid, int t);
 
-    public Boolean checkCollected(int uid, int id, int t);
+    public Boolean checkCollected(Long uid, Long id, int t);
 
-    public Boolean checkHavedSheet(int uid, int sid);
+    public Boolean checkHavedSheet(Long uid, Long sid);
 
 //    public List findCollections(int tid, int uid);
 
-    public AccountAuth getUserInfo(int uid);
+    public AccountAuth getUserInfo(Long uid);
+
+    public void del(Long uid);
 }

@@ -1,31 +1,15 @@
 package com.yaoyili.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Lyric {
 
-    private Integer sid;
+    private Long sid;
 
     private String lyric;
-
-    public Lyric() {}
-
-    public Lyric(Integer sid, String lyric) {
-        this.sid = sid;
-        this.lyric = lyric;
-    }
-
-    public Integer getSid() {
-        return sid;
-    }
-
-    public void setSid(Integer sid) {
-        this.sid = sid;
-    }
-
-    public String getLyric() {
-        return lyric;
-    }
-
-    public void setLyric(String lyric) {
-        this.lyric = lyric;
-    }
 }

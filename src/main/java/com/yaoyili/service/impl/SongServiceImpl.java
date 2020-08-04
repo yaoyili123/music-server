@@ -1,22 +1,19 @@
 package com.yaoyili.service.impl;
 
-import com.yaoyili.controller.CheckException;
-import com.yaoyili.controller.resbeans.SongLyric;
-import com.yaoyili.controller.resbeans.SongResponse;
-import com.yaoyili.dao.AlbumMapper;
-import com.yaoyili.dao.ArtistMapper;
-import com.yaoyili.dao.LyricMapper;
-import com.yaoyili.dao.SongMapper;
-import com.yaoyili.model.Album;
-import com.yaoyili.model.Artist;
+import com.yaoyili.CheckException;
+import com.yaoyili.controller.ao.SongLyric;
+import com.yaoyili.dao.*;
 import com.yaoyili.model.Lyric;
+import com.yaoyili.model.Sheet;
 import com.yaoyili.model.Song;
+import com.yaoyili.service.SheetService;
 import com.yaoyili.service.SongService;
 import com.yaoyili.utils.Global;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
+import static com.yaoyili.utils.CheckUtils.*;
 import java.util.List;
 
 @Service
@@ -24,6 +21,12 @@ public class SongServiceImpl implements SongService {
 
     @Autowired
     private SongMapper songMapper;
+
+    @Autowired
+    private SheetService sheetService;
+
+    @Autowired
+    private SheetSongMapper sheetSongMapper;
 
     @Autowired
     private ArtistMapper artistMapper;
@@ -41,31 +44,36 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public List<SongResponse> findSongs(int id, String type) {
+    public Song find(Long id) {
+        return songMapper.select(id);
+    }
+
+    @Override
+    public List<Song> find(Long id, String type) {
         if (!type.equals("album") && !type.equals("artist") && !type.equals("sheet"))
             throw new CheckException("type参数错误");
         if (type.equals("artist"))
             return songMapper.selectByArtist(id);
         else if (type.equals("album"))
-            return songsConvert(songMapper.selectByAlbum(id));
+            return songMapper.selectByAlbum(id);
         else
-            return songsConvert(songMapper.selectBySheet(id));
+            return songMapper.selectBySheet(id);
     }
 
     @Override
-    public List<SongResponse> findSongsAll(int page, int size, String name, int aid) {
-        Global.checkPageParams(page, size);
+    public List<Song> find(int page, int size, String name, Long aid) {
+        checkPageParams(page, size);
         if (page == -1)
-            return songsConvert(songMapper.selectAll(-1, -1, name, aid));
+            return songMapper.selectAll(-1, -1, name, aid);
         else {
             int offset = (page - 1) * size;
-            return songsConvert(songMapper.selectAll(offset, size, name, aid));
+            return songMapper.selectAll(offset, size, name, aid);
         }
     }
 
     @Override
-    public List<SongResponse> findSongbyName(String name, int limit) {
-        List<SongResponse> responses = songsConvert(songMapper.selectByName(name));
+    public List<Song> findbyName(String name, int limit) {
+        List<Song> responses = songMapper.selectByName(name);
 
         if (limit == -1 || limit > responses.size())
             return responses;
@@ -74,38 +82,61 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
-    public void addSong(SongLyric song) {
-        songMapper.insertSelective(song);
-        lyricMapper.insert(new Lyric(song.getId(), song.getLyric()));
+    @Transactional
+    public void add(SongLyric song) {
+
+        notNull(song, "未知错误");
+        notEmpty(song.getName(), "歌曲名称不能为空");
+        notEmpty(song.getAlbumName(), "专辑名为空！");
+        notEmpty(song.getAuthor(), "作者名为空！");
+        check(song.getArtistId() > 0, "作者ID非法！");
+        check(song.getAlbumId() > 0, "专辑ID非法！");
+        check(song.getName().length() <= 200, "名称长度不能超过200");
+
+        Song data = new Song();
+        BeanUtils.copyProperties(song, data);
+        songMapper.insert(data);
+        lyricMapper.insert(new Lyric(data.getId(), song.getLyric()));
     }
 
     @Override
-    public void updateSong(SongLyric song) {
-        songMapper.updateByPrimaryKeySelective(song);
-        lyricMapper.updateByPrimaryKey(new Lyric(song.getId(), song.getLyric()));
+    @Transactional
+    public void update(SongLyric song) {
+
+        notNull(song, "未知错误");
+        notEmpty(song.getName(), "歌曲名称不能为空");
+        notEmpty(song.getAlbumName(), "专辑名为空！");
+        notEmpty(song.getAuthor(), "作者名为空！");
+        check(song.getArtistId() > 0, "作者ID非法！");
+        check(song.getAlbumId() > 0, "专辑ID非法！");
+        check(song.getName().length() <= 200, "名称长度不能超过200");
+
+        Song data = new Song();
+        BeanUtils.copyProperties(song, data);
+        songMapper.update(data);
+        lyricMapper.update(new Lyric(song.getId(), song.getLyric()));
     }
 
     @Override
-    public void deleteSong(int id) {
-        songMapper.deleteByPrimaryKey(id);
+    @Transactional
+    public void del(Long id) {
+        songMapper.delete(id);
+        sheetService.delSong(id);
+        lyricMapper.delete(id);
     }
 
-    private List<SongResponse> songsConvert(List<Song> songs) {
-        List<SongResponse> responses = new ArrayList<>();
-
-        for(Song song: songs) {
-            Album album = albumMapper.selectByPrimaryKey(song.getAlbumId());
-            Artist artist = artistMapper.selectByPrimaryKey(album.getArtistId());
-            SongResponse response = new SongResponse(song, album.getName(), album.getPicUrl(),artist.getId(), artist.getName());
-            responses.add(response);
+    @Override
+    @Transactional
+    public void delByAlbum(Long aid) {
+        List<Song> songs = songMapper.selectByAlbum(aid);
+        for (Song item : songs) {
+            del(item.getId());
         }
-
-        return responses;
     }
 
     @Override
-    public String findLyric(int id) {
-        Lyric lyric =  lyricMapper.selectByPrimaryKey(id);
+    public String findLyric(Long id) {
+        Lyric lyric =  lyricMapper.select(id);
         if (lyric == null)
             return null;
         else if (lyric.getLyric() == null)

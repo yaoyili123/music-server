@@ -6,15 +6,15 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface AccountAuthMapper {
-    int deleteByPrimaryKey(Integer id);
+    int delete(Long id);
 
-    int insertSelective(AccountAuth record);
+    int insert(AccountAuth record);
 
-    AccountAuth selectByPrimaryKey(Integer id);
+    AccountAuth select(Long id);
 
     AccountAuth checkRepeated(String username);
 
     AccountAuth checkUserAuth(@Param("username")String username,@Param("password") String password);
 
-    int updateByPrimaryKeySelective(AccountAuth record);
+    int update(AccountAuth record);
 }

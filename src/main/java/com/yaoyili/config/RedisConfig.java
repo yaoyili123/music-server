@@ -1,4 +1,4 @@
-package com.yaoyili.controller;
+package com.yaoyili.config;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

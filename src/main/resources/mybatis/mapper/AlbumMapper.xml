@@ -2,15 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.AlbumMapper">
   <resultMap id="BaseResultMap" type="com.yaoyili.model.Album">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="artistId" jdbcType="INTEGER" property="artistId" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="artistId" jdbcType="BIGINT" property="artistId" />
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
     <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
     <result column="company" jdbcType="VARCHAR" property="company" />
-    <result column="play" jdbcType="INTEGER" property="play" />
+    <result column="play" jdbcType="BIGINT" property="play" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, artistId, picUrl, name, company, play
+    id, artistId, picUrl, name, author, company, play
   </sql>
 
   <select id="total" resultType="java.lang.Integer">
@@ -19,23 +20,24 @@
   </select>
 
   <select id="selectRank" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" />
+    select id, name, author, picUrl, play
     from album
     ORDER BY play DESC limit #{n,jdbcType=INTEGER}
   </select>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from album
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <!--不用加索引-->
+  <select id="selectCollections" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from album natural join album_collect
-    where album.id = album_collect.aid and album_collect.uid = #{uid,jdbcType=INTEGER}
+    where album.id = album_collect.aid and album_collect.uid = #{uid,jdbcType=BIGINT}
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -54,7 +56,7 @@
         name like "%"#{name,jdbcType=VARCHAR}"%"
       </if>
       <if test="artistId != -1">
-        and artistId = #{artistId,jdbcType=INTEGER}
+        and artistId = #{artistId,jdbcType=BIGINT}
       </if>
     </where>
     <if test="offset != -1">
@@ -62,19 +64,23 @@
     </if>
   </select>
 
-  <select id="selectByAid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
+  <select id="selectByAid" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, artistId, name, author, picUrl
     from album
-    where artistId = #{id,jdbcType=INTEGER}
+    where artistId = #{id,jdbcType=BIGINT}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="delete" parameterType="java.lang.Long">
     delete from album
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
-  <insert id="insertSelective" parameterType="com.yaoyili.model.Album">
+  <delete id="deleteByArtist" parameterType="java.lang.Long">
+    delete from album
+    where artistId = #{aid,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.yaoyili.model.Album">
     insert into album
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -89,16 +95,19 @@
       <if test="name != null">
         name,
       </if>
+      <if test="author != null">
+        author,
+      </if>
       <if test="company != null">
         company,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="artistId != null">
-        #{artistId,jdbcType=INTEGER},
+        #{artistId,jdbcType=BIGINT},
       </if>
       <if test="picUrl != null">
         #{picUrl,jdbcType=VARCHAR},
@@ -106,17 +115,17 @@
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
+      <if test="author != null">
+        #{author,jdbcType=VARCHAR},
+      </if>
       <if test="company != null">
         #{company,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Album">
+  <update id="update" parameterType="com.yaoyili.model.Album">
     update album
     <set>
-      <if test="artistId != null">
-        artistId = #{artistId,jdbcType=INTEGER},
-      </if>
       <if test="picUrl != null">
         picUrl = #{picUrl,jdbcType=VARCHAR},
       </if>
@@ -127,18 +136,18 @@
         company = #{company,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <update id="updatePlayTimes">
     update album
     set play = #{times,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <update id="updateIncr">
     update album
     set play = play + #{incr,jdbcType=INTEGER}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

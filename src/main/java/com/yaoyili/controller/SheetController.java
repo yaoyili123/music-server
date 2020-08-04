@@ -1,7 +1,7 @@
 package com.yaoyili.controller;
 
-import com.yaoyili.controller.resbeans.ResultBean;
-import com.yaoyili.controller.resbeans.SheetResponse;
+import com.yaoyili.controller.ao.ResultBean;
+import com.yaoyili.model.Sheet;
 import com.yaoyili.service.SheetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -12,86 +12,88 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping(value = "/sheet")
 public class SheetController {
 
     @Autowired
     private SheetService sheetService;
 
-    @PostMapping(value = "addSheet")
-    public ResultBean addSheet(
+    @PostMapping(value = "add")
+    public ResultBean add(
             @RequestParam(value = "name") String name,
-            @RequestParam(value = "uid") int uid)
+            @RequestParam(value = "uid") Long uid,
+            @RequestParam(value = "username") String username)
     {
-        return new ResultBean<SheetResponse>(sheetService.addSheet(name, uid));
+        return new ResultBean<Sheet>(sheetService.add(name, uid, username));
     }
 
-    @GetMapping(value = "/sheets/{uid}")
-    public ResultBean findSheets(@PathVariable(value = "uid") int uid) {
-        return new ResultBean<List<SheetResponse>>(sheetService.findSheets(uid));
+    @GetMapping(value = "/user/{uid}")
+    public ResultBean findByUid(@PathVariable(value = "uid") Long uid) {
+        return new ResultBean<List<Sheet>>(sheetService.findByUid(uid));
     }
 
 
-    @GetMapping(value = "/sheet/{sid}")
-    public ResultBean findSheet(@PathVariable(value = "sid") int sid) {
-        return new ResultBean<SheetResponse>(sheetService.findSheet(sid));
+    @GetMapping(value = "/{sid}")
+    public ResultBean find(@PathVariable(value = "sid") Long sid) {
+        return new ResultBean<Sheet>(sheetService.find(sid));
     }
 
-    @GetMapping(value = "/sheet/collections")
-    public ResultBean findCollections(@RequestParam(value = "uid") int uid) {
-        return new ResultBean<List<SheetResponse>>(sheetService.findCollections(uid));
+    @GetMapping(value = "/cols")
+    public ResultBean findCollections(@RequestParam(value = "uid") Long uid) {
+        return new ResultBean<List<Sheet>>(sheetService.findCollections(uid));
     }
 
     @GetMapping(value = "/checkSong")
     public ResultBean checkSong(
-            @RequestParam(value = "songid") int songid,
-            @RequestParam(value = "sheetid") int sheetid) {
+            @RequestParam(value = "songid") Long songid,
+            @RequestParam(value = "sheetid") Long sheetid) {
         return new ResultBean<Boolean>(sheetService.checkSong(songid, sheetid));
     }
 
 
 
-    @PostMapping(value = "updateSheet")
-    public ResultBean updateSheet(
-            @RequestParam(value = "id") int id,
+    @PostMapping(value = "update")
+    public ResultBean update(
+            @RequestParam(value = "id") Long id,
             @RequestParam(value = "name") String name,
             @RequestParam(value = "description", required = false, defaultValue = "") String description,
             @RequestParam(value = "pic", required = false) MultipartFile pic)
     {
-        sheetService.updateSheet(id, name, description, pic);
+        sheetService.update(id, name, description, pic);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @GetMapping(value = "deleteSheet/{sid}")
-    public ResultBean deleteSheet(@PathVariable(value = "sid") int sid) {
-        sheetService.deleteSheet(sid);
+    @GetMapping(value = "del/{sid}")
+    public ResultBean del(@PathVariable(value = "sid") Long sid) {
+        sheetService.del(sid);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @PostMapping(value = "/song/addsheet")
-    public ResultBean addSongToSheet(
-            @RequestParam(value = "songId") int songId,
-            @RequestParam(value = "sheetId") int sheetId)
+    @PostMapping(value = "/addSong")
+    public ResultBean addToSheet(
+            @RequestParam(value = "songId") Long songId,
+            @RequestParam(value = "sheetId") Long sheetId)
     {
-        sheetService.addSongToSheet(songId, sheetId);
+        sheetService.addToSheet(songId, sheetId);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @PostMapping(value = "/song/delsheet")
-    public ResultBean deleteSongFromSheet(
-            @RequestParam(value = "songId") int songId,
-            @RequestParam(value = "sheetId") int sheetId)
+    @PostMapping(value = "/delSong")
+    public ResultBean delFromSheet(
+            @RequestParam(value = "songId") Long songId,
+            @RequestParam(value = "sheetId") Long sheetId)
     {
-        sheetService.deleteSongFromSheet(songId, sheetId);
+        sheetService.delFromSheet(songId, sheetId);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @PostMapping(value = "/sheet/play")
-    public ResultBean incr(@RequestParam(value = "id") int id) {
+    @PostMapping(value = "/play")
+    public ResultBean incr(@RequestParam(value = "id") Long id) {
         sheetService.incr(id);
         return new ResultBean<Map>(new HashMap());
     }
 
-    @GetMapping(value = "/sheet/rank")
+    @GetMapping(value = "/rank")
     public ResultBean getRank() {
         return new ResultBean<List>(sheetService.getRank());
     }

@@ -8,9 +8,11 @@ public interface AlbumCollectMapper {
 
     AlbumCollectKey check(AlbumCollectKey key);
 
-    int deleteByPrimaryKey(AlbumCollectKey key);
+    int delete(AlbumCollectKey key);
+
+    int deleteByAlbum(Long aid);
+
+    int deleteByUser(Long uid);
 
     int insert(AlbumCollectKey record);
-
-    int insertSelective(AlbumCollectKey record);
 }

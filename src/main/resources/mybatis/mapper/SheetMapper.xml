@@ -2,44 +2,45 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.SheetMapper">
   <resultMap id="BaseResultMap" type="com.yaoyili.model.Sheet">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="BIGINT" property="uid" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
     <result column="songNum" jdbcType="INTEGER" property="songNum" />
     <result column="picUrl" jdbcType="VARCHAR" property="picUrl" />
     <result column="s" jdbcType="TINYINT" property="s" />
-    <result column="play" jdbcType="INTEGER" property="play" />
+    <result column="play" jdbcType="BIGINT" property="play" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.yaoyili.model.Sheet">
     <result column="description" jdbcType="LONGVARCHAR" property="description" />
   </resultMap>
 
-  <sql id="Base_Column_List"> id, name, uid, songNum, picUrl, s, play</sql>
+  <sql id="Base_Column_List"> id, name, uid, username, songNum, picUrl, s, play</sql>
   <sql id="Blob_Column_List"> description </sql>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+  <select id="select" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select *
     from sheet
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
 
   <select id="selectRank" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" />
+    select id, name, username, picUrl, play
     from sheet
     where s = 1
     ORDER BY play DESC limit #{n,jdbcType=INTEGER}
   </select>
 
-  <select id="selectCollections" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectCollections" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select id, name, sheet.uid, songNum, picUrl, s, description, play
     from sheet join sheet_collect
-    where sheet.id = sheet_collect.sid and sheet_collect.uid = #{uid,jdbcType=INTEGER}
+    where sheet.id = sheet_collect.sid and sheet_collect.uid = #{uid,jdbcType=BIGINT}
   </select>
 
-  <select id="selectPublic" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+  <select id="selectPublic" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
     select *
     from sheet
-    where id = #{id,jdbcType=INTEGER} and s = 1
+    where id = #{id,jdbcType=BIGINT} and s = 1
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -49,19 +50,18 @@
     where name like "%"#{name,jdbcType=VARCHAR}"%" and s = 1
   </select>
 
-  <select id="selectByUid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
+  <select id="selectByUid" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, name, username, picUrl, songNum
     from sheet
-    where uid = #{uid,jdbcType=INTEGER}
+    where uid = #{uid,jdbcType=BIGINT}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="delete" parameterType="java.lang.Long">
     delete from sheet
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.yaoyili.model.Sheet">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.yaoyili.model.Sheet">
     insert into sheet
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -69,6 +69,9 @@
       </if>
       <if test="name != null">
         name,
+      </if>
+      <if test="username != null">
+        username,
       </if>
       <if test="uid != null">
         uid,
@@ -88,13 +91,16 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
       <if test="uid != null">
-        #{uid,jdbcType=INTEGER},
+        #{uid,jdbcType=BIGINT},
       </if>
       <if test="songNum != null">
         #{songNum,jdbcType=INTEGER},
@@ -110,14 +116,17 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Sheet">
+  <update id="update" parameterType="com.yaoyili.model.Sheet">
     update sheet
     <set>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
       <if test="uid != null">
-        uid = #{uid,jdbcType=INTEGER},
+        uid = #{uid,jdbcType=BIGINT},
       </if>
       <if test="songNum != null">
         songNum = #{songNum,jdbcType=INTEGER},
@@ -132,7 +141,7 @@
         s = #{s,jdbcType=TINYINT},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <update id="updatePlayTimes">

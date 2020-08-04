@@ -9,9 +9,12 @@ public interface SheetCollectMapper {
 
     SheetCollectKey check(SheetCollectKey key);
 
-    int deleteByPrimaryKey(SheetCollectKey key);
+    int delete(SheetCollectKey key);
+
+    int deleteBySheet(Long sid);
+
+    int deleteByUser(Long uid);
 
     int insert(SheetCollectKey record);
 
-    int insertSelective(SheetCollectKey record);
 }

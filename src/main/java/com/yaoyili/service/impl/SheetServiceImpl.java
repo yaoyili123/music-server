@@ -1,18 +1,19 @@
 package com.yaoyili.service.impl;
 
-import com.yaoyili.controller.*;
-import com.yaoyili.controller.resbeans.SheetResponse;
 import com.yaoyili.dao.*;
 import com.yaoyili.model.*;
+import com.yaoyili.CheckException;
 import com.yaoyili.service.SheetService;
 import com.yaoyili.utils.Global;
 import com.yaoyili.utils.RedisUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import static com.yaoyili.utils.CheckUtils.*;
 import java.util.*;
 
 @Service
@@ -28,33 +29,34 @@ public class SheetServiceImpl implements SheetService {
     private SheetSongMapper sheetSongMapper;
 
     @Autowired
+    private SheetCollectMapper sheetCollectMapper;
+
+    @Autowired
     private RedisUtils redisUtils;
 
     @Override
-    public List<SheetResponse> findSheets(int uid) {
-        return sheetsConvert(sheetMapper.selectByUid(uid));
+    public List<Sheet> findByUid(Long uid) {
+        return sheetMapper.selectByUid(uid);
     }
 
     @Override
-    public SheetResponse findSheet(int sid) {
-        List<Sheet> sheets = new ArrayList<>();
-        sheets.add(sheetMapper.selectByPrimaryKey(sid));
-        return sheetsConvert(sheets).get(0);
+    public Sheet find(Long sid) {
+        return sheetMapper.select(sid);
     }
 
     @Override
-    public List<SheetResponse> findCollections(int uid) {
-        return sheetsConvert(sheetMapper.selectCollections(uid));
+    public List<Sheet> findCollections(Long uid) {
+        return sheetMapper.selectCollections(uid);
     }
 
     @Override
-    public Boolean checkSong(int songid, int sheetid) {
-        return sheetSongMapper.selectByPrimaryKey(new SheetSongKey(songid, sheetid)) == null ? false : true;
+    public Boolean checkSong(Long songid, Long sheetid) {
+        return sheetSongMapper.select(new SheetSongKey(songid, sheetid)) == null ? false : true;
     }
 
     @Override
-    public List<SheetResponse> findSheetbyName(String name, int limit) {
-        List<SheetResponse> responses = sheetsConvert(sheetMapper.selectByName(name));
+    public List<Sheet> findbyName(String name, int limit) {
+        List<Sheet> responses = sheetMapper.selectByName(name);
 
         if (limit == -1 || limit > responses.size())
             return responses;
@@ -63,74 +65,95 @@ public class SheetServiceImpl implements SheetService {
     }
 
     @Override
-    public SheetResponse addSheet(String name, int uid) {
-        if (name == null || name.isEmpty())
-            throw new CheckException("名字不能为空");
+    public Sheet add(String name, Long uid, String username) {
+
+        notEmpty(name, "名字不能为空");
+        check(uid > 0, "UID不合法");
+        check(name.length() <= 40, "名称长度不能超过40");
+
         Sheet sheet = new Sheet();
         sheet.setName(name);
+        sheet.setUsername(username);
         sheet.setPicUrl(Global.HOST_NAME + '/' + Global.DEAFAULT_SHEETPIC);
         sheet.setUid(uid);
         sheet.setSongNum(0);
-        sheetMapper.insertSelective(sheet);
-        List<Sheet> sheets = new ArrayList<>();
-        sheets.add(sheetMapper.selectByPrimaryKey(sheet.getId()));
-        return sheetsConvert(sheets).get(0);
+        sheetMapper.insert(sheet);
+        return sheet;
     }
 
     @Override
-    public void updateSheet(int id, String name, String des, MultipartFile file) {
+    public void update(Long id, String name, String des, MultipartFile file) {
+
+        notEmpty(name, "名字不能为空");
+        notNull(des, "描述不能为空");
+        check(id > 0, "ID不合法");
+        check(name.length() <= 40, "名称长度不能超过40");
+
         Sheet sheet = new Sheet();
         sheet.setId(id);
         sheet.setName(name);
         if (file != null)
             sheet.setPicUrl(Global.HOST_NAME + '/' + file.getOriginalFilename());
         sheet.setDescription(des);
-        sheetMapper.updateByPrimaryKeySelective(sheet);
+        sheetMapper.update(sheet);
     }
 
     @Override
-    public void deleteSheet(int sid) {
-        sheetMapper.deleteByPrimaryKey(sid);
+    @Transactional
+    public void del(Long sid) {
+        sheetMapper.delete(sid);
+        sheetSongMapper.deleteBySheet(sid);
+        sheetCollectMapper.deleteBySheet(sid);
     }
 
     @Override
-    public void addSongToSheet(int songId, int sheetId) {
-        if (sheetSongMapper.selectByPrimaryKey(new SheetSongKey(songId, sheetId)) != null)
+    @Transactional
+    public void delByUser(Long uid) {
+        List<Sheet> sheets = sheetMapper.selectByUid(uid);
+        for (Sheet item: sheets) {
+            del(item.getId());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void addToSheet(Long songId, Long sheetId) {
+        if (sheetSongMapper.select(new SheetSongKey(songId, sheetId)) != null)
             throw new CheckException("已添加到歌单");
-        Sheet sheet = sheetMapper.selectByPrimaryKey(sheetId);
+        Sheet sheet = sheetMapper.select(sheetId);
         sheet.setSongNum(sheet.getSongNum() + 1);
         sheetSongMapper.insert(new SheetSongKey(songId, sheetId));
-        sheetMapper.updateByPrimaryKeySelective(sheet);
+        sheetMapper.update(sheet);
     }
 
     @Override
-    public void deleteSongFromSheet(int songId, int sheetId) {
-        Sheet sheet = sheetMapper.selectByPrimaryKey(sheetId);
+    @Transactional
+    public void delFromSheet(Long songId, Long sheetId) {
+        Sheet sheet = sheetMapper.select(sheetId);
         sheet.setSongNum(sheet.getSongNum() - 1);
-        sheetSongMapper.deleteByPrimaryKey(new SheetSongKey(songId, sheetId));
-        sheetMapper.updateByPrimaryKeySelective(sheet);
+        sheetSongMapper.delete(new SheetSongKey(songId, sheetId));
+        sheetMapper.update(sheet);
     }
 
-    private List<SheetResponse> sheetsConvert(List<Sheet> sheets) {
-        List<SheetResponse> responses = new ArrayList<>();
-        for(Sheet sheet: sheets) {
-            AccountAuth account = accountAuthMapper.selectByPrimaryKey(sheet.getUid());
-            SheetResponse response = new SheetResponse(sheet, account.getNickname());
-            responses.add(response);
+    //删除歌曲的同时删除歌单中的歌曲
+    @Override
+    @Transactional
+    public void delSong(Long id) {
+        List<SheetSongKey> list = sheetSongMapper.selectBySong(id);
+        for (SheetSongKey item: list) {
+            delFromSheet(id, item.getSheetid());
         }
-
-        return responses;
     }
 
     @Override
-    public List<SheetResponse> getRank() {
-        List<SheetResponse> sheets = null;
+    public List<Sheet> getRank() {
+        List<Sheet> sheets = null;
         String rKey = "sheet:rank";
         if (!redisUtils.hasKey(rKey)) {
-            sheets = sheetsConvert(sheetMapper.selectRank(Global.RANK_LENGTH));
+            sheets = sheetMapper.selectRank(Global.RANK_LENGTH);
             Set<ZSetOperations.TypedTuple<Object>> tuples
                     = new HashSet<ZSetOperations.TypedTuple<Object>>();
-            for (SheetResponse sheet : sheets) {
+            for (Sheet sheet : sheets) {
                 ZSetOperations.TypedTuple<Object> objectTypedTuple
                         = new DefaultTypedTuple<Object>(sheet, (double)sheet.getPlay());
                 tuples.add(objectTypedTuple);
@@ -147,20 +170,25 @@ public class SheetServiceImpl implements SheetService {
     @Override
     public void updateRank() {
         String rKey = "sheet:rank";
-        List<SheetResponse> sheets = sheetsConvert(sheetMapper.selectRank(Global.RANK_LENGTH));
+        List<Sheet> sheets = sheetMapper.selectRank(Global.RANK_LENGTH);
         redisUtils.del(rKey);
         Set<ZSetOperations.TypedTuple<Object>> tuples
                 = new HashSet<ZSetOperations.TypedTuple<Object>>();
-        for (SheetResponse sheet : sheets) {
+        for (Sheet sheet : sheets) {
             ZSetOperations.TypedTuple<Object> objectTypedTuple
                     = new DefaultTypedTuple<Object>(sheet, (double)sheet.getPlay());
             tuples.add(objectTypedTuple);
         }
+//        if (sheets.size() > 0) {
         redisUtils.zadds(rKey, tuples);
+//        }
+//        else {
+//            redisUtils.del(rKey);
+//        }
     }
 
     @Override
-    public void incr(Integer id) {
+    public void incr(Long id) {
         String key = "sheet:" + id.toString() + ":incr";
         redisUtils.incr(key, 1);
     }
@@ -173,7 +201,7 @@ public class SheetServiceImpl implements SheetService {
 
         for (String key : keys) {
             int incr = values.get(idx++);
-            int id = Integer.parseInt(key.substring(6, key.length()-5));
+            Long id = Long.parseLong(key.substring(6, key.length()-5));
             sheetMapper.updateIncr(id, incr);
         }
 

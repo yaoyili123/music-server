@@ -1,18 +1,20 @@
 package com.yaoyili.service.impl;
 
-import com.yaoyili.controller.resbeans.AlbumResponse;
+import com.yaoyili.dao.AlbumCollectMapper;
 import com.yaoyili.dao.AlbumMapper;
 import com.yaoyili.dao.ArtistMapper;
 import com.yaoyili.model.Album;
 import com.yaoyili.model.Artist;
 import com.yaoyili.service.AlbumService;
+import com.yaoyili.service.SongService;
 import com.yaoyili.utils.Global;
 import com.yaoyili.utils.RedisUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.DefaultTypedTuple;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import static com.yaoyili.utils.CheckUtils.*;
 import java.util.*;
 
 @Service
@@ -25,6 +27,12 @@ public class AlbumServiceImpl implements AlbumService {
     private ArtistMapper artistMapper;
 
     @Autowired
+    private SongService songService;
+
+    @Autowired
+    private AlbumCollectMapper albumCollectMapper;
+
+    @Autowired
     private RedisUtils redisUtils;
 
     @Override
@@ -33,31 +41,29 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public AlbumResponse findAlbum(int id) {
-        List<Album> albums = new ArrayList<>();
-        albums.add(albumMapper.selectByPrimaryKey(id));
-        return albumsConvert(albums).get(0);
+    public Album find(Long id) {
+        return albumMapper.select(id);
     }
 
     @Override
-    public List<AlbumResponse> findAlbums(int page, int size, String name, int aid) {
-        Global.checkPageParams(page, size);
+    public List<Album> find(int page, int size, String name, Long aid) {
+        checkPageParams(page, size);
         if (page == -1)
-            return albumsConvert(albumMapper.selectAll(-1, -1, name, aid));
+            return albumMapper.selectAll(-1, -1, name, aid);
         else {
             int offset = (page - 1) * size;
-            return albumsConvert(albumMapper.selectAll(offset, size, name, aid));
+            return albumMapper.selectAll(offset, size, name, aid);
         }
     }
 
     @Override
-    public List<AlbumResponse> findAlbumsByArtist(int aid) {
-        return albumsConvert(albumMapper.selectByAid(aid));
+    public List<Album> findByArtist(Long aid) {
+        return albumMapper.selectByAid(aid);
     }
 
     @Override
-    public List<AlbumResponse> findAlbumbyName(String name, int limit) {
-        List<AlbumResponse> responses = albumsConvert(albumMapper.selectByName(name));
+    public List<Album> findbyName(String name, int limit) {
+        List<Album> responses = albumMapper.selectByName(name);
 
         if (limit == -1 || limit > responses.size())
             return responses;
@@ -66,47 +72,61 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public List<AlbumResponse> findCollections(int uid) {
-        return albumsConvert(albumMapper.selectCollections(uid));
+    public List<Album> findCollections(Long uid) {
+        return albumMapper.selectCollections(uid);
     }
 
     @Override
-    public void addAlbum(Album album) {
+    public void add(Album album) {
+        notNull(album, "未知错误");
+        notEmpty(album.getName(), "专辑名称不能为空");
+        notEmpty(album.getAuthor(), "作者名为空！");
+        check(album.getArtistId() > 0, "作者ID非法！");
+        check(album.getName().length() <= 100, "名称长度不能超过100");
+
         if(album.getPicUrl().isEmpty() || album.getPicUrl() == null)
             album.setPicUrl(Global.HOST_NAME + '/' + Global.DEAFAULT_SHEETPIC);
-        albumMapper.insertSelective(album);
+        albumMapper.insert(album);
     }
 
     @Override
-    public void updateAlbum(Album album) {
-        albumMapper.updateByPrimaryKeySelective(album);
+    public void update(Album album) {
+
+        notNull(album, "未知错误");
+        notEmpty(album.getName(), "专辑名称不能为空");
+        notEmpty(album.getAuthor(), "作者名为空！");
+        check(album.getArtistId() > 0, "作者ID非法！");
+        check(album.getName().length() <= 100, "名称长度不能超过100");
+
+        albumMapper.update(album);
     }
 
     @Override
-    public void delAlbum(Integer id) {
-        albumMapper.deleteByPrimaryKey(id);
+    @Transactional
+    public void del(Long id) {
+        albumMapper.delete(id);
+        albumCollectMapper.deleteByAlbum(id);
+        songService.delByAlbum(id);
     }
 
-    private List<AlbumResponse> albumsConvert(List<Album> albums) {
-        List<AlbumResponse> responses = new ArrayList<>();
-        for(Album album: albums) {
-            Artist artist = artistMapper.selectByPrimaryKey(album.getArtistId());
-            AlbumResponse response = new AlbumResponse(album, artist.getName());
-            responses.add(response);
+    @Override
+    @Transactional
+    public void delByArtist(Long aid) {
+        List<Album> artists = findByArtist(aid);
+        for (Album item : artists) {
+            del(item.getId());
         }
-
-        return responses;
     }
 
     @Override
-    public List<AlbumResponse> getRank() {
-        List<AlbumResponse> albums = null;
+    public List<Album> getRank() {
+        List<Album> albums = null;
         String rKey = "album:rank";
         if (!redisUtils.hasKey(rKey)) {
-            albums = albumsConvert(albumMapper.selectRank(Global.RANK_LENGTH));
+            albums = albumMapper.selectRank(Global.RANK_LENGTH);
             Set<ZSetOperations.TypedTuple<Object>> tuples
                     = new HashSet<ZSetOperations.TypedTuple<Object>>();
-            for (AlbumResponse album : albums) {
+            for (Album album : albums) {
                 ZSetOperations.TypedTuple<Object> objectTypedTuple
                         = new DefaultTypedTuple<Object>(album, (double)album.getPlay());
                 tuples.add(objectTypedTuple);
@@ -123,11 +143,11 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public void updateRank() {
         String rKey = "album:rank";
-        List<AlbumResponse> albums = albumsConvert(albumMapper.selectRank(Global.RANK_LENGTH));
+        List<Album> albums = albumMapper.selectRank(Global.RANK_LENGTH);
         redisUtils.del(rKey);
         Set<ZSetOperations.TypedTuple<Object>> tuples
                 = new HashSet<ZSetOperations.TypedTuple<Object>>();
-        for (AlbumResponse album : albums) {
+        for (Album album : albums) {
             ZSetOperations.TypedTuple<Object> objectTypedTuple
                     = new DefaultTypedTuple<Object>(album, (double)album.getPlay());
             tuples.add(objectTypedTuple);
@@ -136,7 +156,7 @@ public class AlbumServiceImpl implements AlbumService {
     }
 
     @Override
-    public void incr(Integer id) {
+    public void incr(Long id) {
         String key = "album:" + id.toString() + ":incr";
         redisUtils.incr(key, 1);
     }

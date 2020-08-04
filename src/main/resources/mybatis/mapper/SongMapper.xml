@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yaoyili.dao.SongMapper">
-
   <resultMap id="BaseResultMap" type="com.yaoyili.model.Song">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="albumId" jdbcType="INTEGER" property="albumId" />
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="albumId" jdbcType="BIGINT" property="albumId" />
     <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="mUrl" jdbcType="VARCHAR" property="mUrl" />
-  </resultMap>
-
-  <resultMap id="ResponseMap" type="com.yaoyili.controller.resbeans.SongResponse">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="albumId" jdbcType="INTEGER" property="albumId" />
-    <result column="name" jdbcType="VARCHAR" property="name" />
-    <result column="mUrl" jdbcType="VARCHAR" property="mUrl" />
+    <result column="musicUrl" jdbcType="VARCHAR" property="musicUrl" />
     <result column="albumName" jdbcType="VARCHAR" property="albumName" />
     <result column="albumUrl" jdbcType="VARCHAR" property="albumUrl" />
-    <result column="artistId" jdbcType="INTEGER" property="artistId" />
+    <result column="artistId" jdbcType="BIGINT" property="artistId" />
     <result column="author" jdbcType="VARCHAR" property="author" />
   </resultMap>
 
   <sql id="Base_Column_List">
-    id, albumId, name, mUrl
+    id, albumId, name, musicUrl, albumName, albumUrl, artistId, author
   </sql>
 
   <select id="total" resultType="java.lang.Integer">
@@ -29,11 +21,11 @@
     from song
   </select>
 
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="select" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from song
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
 
   <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -52,7 +44,7 @@
         name like "%"#{name,jdbcType=VARCHAR}"%"
       </if>
       <if test="albumId != -1">
-        and albumId = #{albumId,jdbcType=INTEGER}
+        and albumId = #{albumId,jdbcType=BIGINT}
       </if>
     </where>
     <if test="offset != -1">
@@ -60,33 +52,43 @@
     </if>
   </select>
 
-  <select id="selectByAlbum" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
+  <select id="selectByAlbum" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, name, musicUrl
     from song
-    where albumId = #{id,jdbcType=INTEGER}
+    where albumId = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectByArtist" parameterType="java.lang.Integer" resultMap="ResponseMap">
-    SELECT song.id as id, song.albumId as albumId, song.`name` as name, song.`mUrl` as mUrl, album.`name` as albumName,
-	album.`picUrl` as albumUrl, album.artistId as artistId, artist.`name` as author
-    FROM `artist` JOIN `album` JOIN `song`
-    WHERE #{id,jdbcType=INTEGER} = artist.id AND album.artistId = artist.id AND album.id = song.albumId
+  <select id="selectByArtist" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    SELECT id, name, musicUrl
+    FROM  song
+    WHERE artistId = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectBySheet" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectBySheet" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from song join sheet_song
-    where sheetid = #{id,jdbcType=INTEGER} AND songid = id
+    where sheetid = #{id,jdbcType=BIGINT} AND songid = id
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="delete" parameterType="java.lang.Long">
     delete from song
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
 
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="com.yaoyili.model.Song">
+  <!--不能用参考列来删除，因为无法获取到删除的歌曲ID，因而无法删除歌曲的其他参考表中的行-->
+
+  <!--<delete id="deleteByArtist" parameterType="java.lang.Long">-->
+  <!--delete from song-->
+  <!--where artistId = #{aid,jdbcType=BIGINT}-->
+  <!--</delete>-->
+
+  <!--<delete id="deleteByAlbum" parameterType="java.lang.Long">-->
+    <!--delete from song-->
+    <!--where albumId = #{aid,jdbcType=BIGINT}-->
+  <!--</delete>-->
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.yaoyili.model.Song">
     insert into song
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -95,11 +97,23 @@
       <if test="albumId != null">
         albumId,
       </if>
+      <if test="artistId != null">
+        artistId,
+      </if>
       <if test="name != null">
         name,
       </if>
-      <if test="mUrl != null">
-        mUrl,
+      <if test="author != null">
+        author,
+      </if>
+      <if test="albumName != null">
+        albumName,
+      </if>
+      <if test="albumUrl != null">
+        albumUrl,
+      </if>
+      <if test="musicUrl != null">
+        musicUrl,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -107,29 +121,38 @@
         #{id,jdbcType=INTEGER},
       </if>
       <if test="albumId != null">
-        #{albumId,jdbcType=INTEGER},
+        #{albumId,jdbcType=BIGINT},
+      </if>
+      <if test="artistId != null">
+        #{artistId,jdbcType=BIGINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
-      <if test="mUrl != null">
-        #{mUrl,jdbcType=VARCHAR},
+      <if test="author != null">
+        #{author,jdbcType=VARCHAR},
+      </if>
+      <if test="albumName != null">
+        #{albumName,jdbcType=VARCHAR},
+      </if>
+      <if test="albumUrl != null">
+        #{albumUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="musicUrl != null">
+        #{musicUrl,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yaoyili.model.Song">
+  <update id="update" parameterType="com.yaoyili.model.Song">
     update song
     <set>
-      <if test="albumId != null">
-        albumId = #{albumId,jdbcType=INTEGER},
-      </if>
       <if test="name != null">
         name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="mUrl != null">
-        mUrl = #{mUrl,jdbcType=VARCHAR},
+      <if test="musicUrl != null">
+        musicUrl = #{musicUrl,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

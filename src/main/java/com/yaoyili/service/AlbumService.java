@@ -1,6 +1,5 @@
 package com.yaoyili.service;
 
-import com.yaoyili.controller.resbeans.AlbumResponse;
 import com.yaoyili.model.Album;
 
 import java.util.List;
@@ -9,27 +8,29 @@ public interface AlbumService {
 
     int total();
 
-    List<AlbumResponse> getRank();
+    List<Album> getRank();
 
     void updateRank();
 
-    List<AlbumResponse> findAlbumbyName(String name, int limit);
+    List<Album> findbyName(String name, int limit);
 
-    AlbumResponse findAlbum(int id);
+    Album find(Long id);
 
-    List<AlbumResponse> findAlbums(int page, int size, String name, int aid);
+    List<Album> find(int page, int size, String name, Long aid);
 
-    List<AlbumResponse> findAlbumsByArtist(int aid);
+    List<Album> findByArtist(Long aid);
 
-    List<AlbumResponse> findCollections(int uid);
+    List<Album> findCollections(Long uid);
 
-    void addAlbum(Album album);
+    void add(Album album);
 
-    void updateAlbum(Album album);
+    void update(Album album);
 
-    void delAlbum(Integer id);
+    void del(Long id);
 
-    void incr(Integer id);
+    void delByArtist(Long aid);
+
+    void incr(Long id);
 
     void updatePlay();
 }

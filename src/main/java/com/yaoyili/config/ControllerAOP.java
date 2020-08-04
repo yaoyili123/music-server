@@ -1,6 +1,8 @@
-package com.yaoyili.controller;
+package com.yaoyili.config;
 
-import com.yaoyili.controller.resbeans.ResultBean;
+import com.yaoyili.CheckException;
+import com.yaoyili.ParamErrorException;
+import com.yaoyili.controller.ao.ResultBean;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,8 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.sql.SQLException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 /*
 * 通用controller的切面，进行异常处理、日志打印等通用过程
@@ -21,7 +22,7 @@ public class ControllerAOP {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerAOP.class);
 
-    @Pointcut("execution(public com.yaoyili.controller.resbeans.ResultBean *(..))")
+    @Pointcut("execution(public com.yaoyili.controller.ao.ResultBean *(..))")
     void controllerHandler() {}
 
 
@@ -55,10 +56,16 @@ public class ControllerAOP {
     private ResultBean<?> handleException(ProceedingJoinPoint pjp, Throwable e) {
         ResultBean<?> res = new ResultBean();
         e.printStackTrace();
-        // 已知异常
+
         if (e instanceof CheckException) {
+            //业务逻辑错误
             res.setMsg(e.getLocalizedMessage());
             res.setCode(ResultBean.FAIL);
+        }
+        else if (e instanceof ParamErrorException) {
+            //参数校验错误
+            res.setMsg(e.getLocalizedMessage());
+            res.setCode(ResultBean.CHECK_ERROR);
         }
         else if (e instanceof RuntimeException) {
             res.setMsg("操作失败");

@@ -9,25 +9,25 @@ import java.util.List;
 @Mapper
 public interface SheetMapper {
 
-    int deleteByPrimaryKey(Integer id);
+    int delete(Long id);
 
-    int insertSelective(Sheet record);
+    int insert(Sheet record);
 
-    Sheet selectByPrimaryKey(Integer id);
+    Sheet select(Long id);
 
-    List<Sheet> selectCollections(int uid);
+    List<Sheet> selectCollections(Long uid);
 
-    List<Sheet> selectByUid(Integer uid);
+    List<Sheet> selectByUid(Long uid);
 
-    List<Sheet> selectPublic(Integer uid);
+    List<Sheet> selectPublic(Long uid);
 
     List<Sheet> selectByName(String name);
 
-    int updateByPrimaryKeySelective(Sheet record);
+    int update(Sheet record);
 
-    int updatePlayTimes(@Param("id") int id, @Param("times") long times);
+    int updatePlayTimes(@Param("id") Long id, @Param("times") long times);
 
-    int updateIncr(@Param("id") int id, @Param("incr") long incr);
+    int updateIncr(@Param("id") Long id, @Param("incr") long incr);
 
     List<Sheet> selectRank(int n);
 }

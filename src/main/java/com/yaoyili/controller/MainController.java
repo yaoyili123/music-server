@@ -1,6 +1,6 @@
 package com.yaoyili.controller;
 
-import com.yaoyili.controller.resbeans.ResultBean;
+import com.yaoyili.controller.ao.ResultBean;
 import com.yaoyili.service.*;
 import com.yaoyili.utils.Global;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +44,10 @@ public class MainController {
             @RequestParam(value = "kw") String kw,
             @RequestParam(value = "limit", required = false, defaultValue = "-1") int limit) {
         HashMap<String, Object> res = new HashMap<>();
-        res.put("songs", songService.findSongbyName(kw, limit));
-        res.put("sheets", sheetService.findSheetbyName(kw, limit));
-        res.put("artists", artistService.findArtistbyName(kw, limit));
-        res.put("albums", albumService.findAlbumbyName(kw, limit));
+        res.put("songs", songService.findbyName(kw, limit));
+        res.put("sheets", sheetService.findbyName(kw, limit));
+        res.put("artists", artistService.findbyName(kw, limit));
+        res.put("albums", albumService.findbyName(kw, limit));
 
         return new ResultBean<Map>(res);
     }

@@ -1,31 +1,15 @@
 package com.yaoyili.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SheetSongKey {
-    private Integer songid;
 
-    private Integer sheetid;
+    private Long songid;
 
-    public SheetSongKey() {
-    }
-
-    public SheetSongKey(Integer songid, Integer sheetid) {
-        this.songid = songid;
-        this.sheetid = sheetid;
-    }
-
-    public Integer getSongid() {
-        return songid;
-    }
-
-    public void setSongid(Integer songid) {
-        this.songid = songid;
-    }
-
-    public Integer getSheetid() {
-        return sheetid;
-    }
-
-    public void setSheetid(Integer sheetid) {
-        this.sheetid = sheetid;
-    }
+    private Long sheetid;
 }

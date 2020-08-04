@@ -1,8 +1,6 @@
 package com.yaoyili.service;
 
-import com.yaoyili.controller.resbeans.SongLyric;
-import com.yaoyili.controller.resbeans.SongResponse;
-import com.yaoyili.model.Lyric;
+import com.yaoyili.controller.ao.SongLyric;
 import com.yaoyili.model.Song;
 
 import java.util.List;
@@ -11,17 +9,21 @@ public interface SongService {
 
     int total();
 
-    List<SongResponse> findSongbyName(String name, int limit);
+    List<Song> findbyName(String name, int limit);
 
-    List<SongResponse> findSongsAll(int page, int size, String name, int aid);
+    List<Song> find(int page, int size, String name, Long aid);
 
-    List<SongResponse> findSongs(int aid, String type);
+    List<Song> find(Long aid, String type);
 
-    void addSong(SongLyric song);
+    Song find(Long id);
 
-    void updateSong(SongLyric song);
+    void add(SongLyric song);
 
-    void deleteSong(int id);
+    void update(SongLyric song);
 
-    String findLyric(int id);
+    void del(Long id);
+
+    void delByAlbum(Long aid);
+
+    String findLyric(Long id);
 }

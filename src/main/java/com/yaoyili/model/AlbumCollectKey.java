@@ -1,28 +1,15 @@
 package com.yaoyili.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlbumCollectKey {
-    private Integer uid;
+    private Long uid;
 
-    private Integer aid;
+    private Long aid;
 
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public Integer getAid() {
-        return aid;
-    }
-
-    public void setAid(Integer aid) {
-        this.aid = aid;
-    }
-
-    public AlbumCollectKey(Integer uid, Integer aid) {
-        this.uid = uid;
-        this.aid = aid;
-    }
 }

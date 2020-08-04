@@ -6,19 +6,19 @@ import java.util.List;
 
 public interface ArtistService {
 
-    List<Artist> findArtistbyName(String name, int limit);
+    List<Artist> findbyName(String name, int limit);
 
-    List<Artist> findArtistsAll(int page, int size, String name);
+    List<Artist> find(int page, int size, String name);
 
     int total();
 
-    Artist findAritist(int id);
+    Artist find(Long id);
 
-    List<Artist> findCollections(int uid);
+    List<Artist> findCollections(Long uid);
 
-    void addArtist(Artist artist);
+    void add(Artist artist);
 
-    void updateArtist(Artist artist);
+    void update(Artist artist);
 
-    void deleteArtist(int id);
+    void del(Long id);
 }

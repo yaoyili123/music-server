@@ -1,37 +1,41 @@
 package com.yaoyili.service;
 
-import com.yaoyili.controller.resbeans.SheetResponse;
+import com.yaoyili.model.Sheet;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface SheetService {
 
-    List<SheetResponse> findSheetbyName(String name, int limit);
+    List<Sheet> findbyName(String name, int limit);
 
-    List<SheetResponse> getRank();
+    List<Sheet> getRank();
 
     void updateRank();
 
     void updatePlay();
 
-    List<SheetResponse> findCollections(int uid);
+    List<Sheet> findCollections(Long uid);
 
-    SheetResponse addSheet(String name, int uid);
+    Sheet add(String name, Long uid, String username);
 
-    List<SheetResponse> findSheets(int uid);
+    List<Sheet> findByUid(Long uid);
 
-    SheetResponse findSheet(int sid);
+    Sheet find(Long sid);
 
-    Boolean checkSong(int songid, int sheetid);
+    Boolean checkSong(Long songid, Long sheetid);
 
-    void updateSheet(int id, String name, String des, MultipartFile file);
+    void update(Long id, String name, String des, MultipartFile file);
 
-    void deleteSheet(int sid);
+    void del(Long sid);
 
-    void addSongToSheet(int songId, int sheetId);
+    void delByUser(Long uid);
 
-    void deleteSongFromSheet(int songId, int sheetId);
+    void addToSheet(Long songId, Long sheetId);
 
-    void incr(Integer id);
+    void delFromSheet(Long songId, Long sheetId);
+
+    void delSong(Long songId);
+
+    void incr(Long id);
 }
